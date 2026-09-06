@@ -1,0 +1,1015 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="An AI receptionist that answers every call and text, knows your business, books the appointment, and hands you the ones that need a human.">
+<meta property="og:title" content="Agent 47 — AI Receptionist">
+<meta property="og:description" content="Your phone stops going to voicemail.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://theagent47.com/">
+<meta property="og:image" content="https://theagent47.com/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<title>Agent 47 Receptionist</title>
+<script>document.documentElement.className += ' fx';</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@400;600;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+
+<style>
+:root{
+  /* Palette lifted from the reference site's own tokens. */
+  --void:#000000;
+  --ground:#000000;
+  --surface:#111111;
+  --surface-2:#1A1A1A;
+  --line:#222222;
+  --line-soft:#1a1a1a;
+  --line-visible:#333333;
+  --ink:#FFFFFF;
+  --ink-2:#E8E8E8;
+  --muted:#999999;
+  --dim:#666666;
+  --live:#E5690F;
+  --live-dim:#7a3708;
+  --accent-subtle:rgba(229,105,15,.15);
+  --success:#4A9E5C;
+  --warm:#5B9BF6;
+  --maxw:1160px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);
+  background-color:var(--ground);
+  background-image:radial-gradient(circle at 8px 7px, rgba(255,255,255,.055) 0 1px, transparent 1.5px);
+  background-size:26px 26px;
+  background-attachment:fixed;
+  font-family:"Space Mono",ui-monospace,monospace;
+  font-size:15px;line-height:1.72;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;position:relative;z-index:2}
+#stage{
+  position:fixed;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;display:block;
+}
+.vignette{
+  position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at center, #0000 40%, #000000a6);
+}
+nav,header.hero,section,footer{position:relative;z-index:2}
+
+/* ── shared type ── */
+.mono{font-family:"Space Mono",ui-monospace,monospace}
+.label{
+  font-family:"Space Mono",ui-monospace,monospace;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:500;
+}
+.label.dim{color:var(--muted)}
+h1,h2,h3{font-family:Doto,"Space Mono",monospace;font-weight:700;letter-spacing:.02em}
+h2{font-size:clamp(28px,4.1vw,46px);line-height:1.14;margin:0 0 18px;text-wrap:balance}
+h3{font-size:22px;margin:0 0 8px;line-height:1.25}
+p{margin:0 0 18px;color:var(--ink-2);max-width:64ch}
+em{font-style:normal;color:var(--ink)}
+a{color:inherit}
+
+/* ── nav ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  backdrop-filter:blur(8px);background:rgba(0,0,0,.78);
+  border-bottom:1px solid var(--line-soft);
+}
+nav .inner{
+  max-width:var(--maxw);margin:0 auto;padding:15px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.brand{display:flex;align-items:center;gap:11px;font-family:"Space Mono",monospace;
+  font-size:13px;letter-spacing:.2em;font-weight:700;text-decoration:none;color:var(--ink)}
+.brand .dot{width:7px;height:7px;border-radius:50%;background:var(--live);
+  box-shadow:0 0 0 0 rgba(229,105,15,.6);animation:ping 2.4s ease-out infinite}
+@keyframes ping{
+  0%{box-shadow:0 0 0 0 rgba(229,105,15,.55)}
+  70%{box-shadow:0 0 0 9px rgba(229,105,15,0)}
+  100%{box-shadow:0 0 0 0 rgba(229,105,15,0)}
+}
+.navlinks{display:flex;gap:26px;align-items:center}
+.navlinks a{font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.navlinks a:hover,.navlinks a:focus-visible{color:var(--ink)}
+@media(max-width:800px){.navlinks{display:none}}
+
+.btn{
+  display:inline-block;font-family:"Space Mono",monospace;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;text-decoration:none;
+  padding:12px 22px;border:1px solid var(--ink-2);color:var(--ink);
+  background:transparent;cursor:pointer;transition:all .22s;border-radius:2px;
+}
+.btn:hover,.btn:focus-visible{background:var(--ink);color:var(--void)}
+.btn.ghost{border-color:var(--line-visible);color:var(--muted)}
+.btn.ghost:hover,.btn.ghost:focus-visible{border-color:var(--ink-2);background:transparent;color:var(--ink)}
+:focus-visible{outline:2px solid var(--live);outline-offset:3px}
+
+/* ── hero ── */
+header.hero{padding:150px 0 90px;position:relative;overflow:hidden}
+
+.hero-grid{display:block;position:relative;z-index:2}
+/* Cap the text itself, not the wrap — otherwise .wrap's auto margins centre
+   the whole column and the hero stops aligning with the sections below.
+   The copy sits in a single child div, so the cap goes there. */
+.hero-grid > div{max-width:560px}
+@media(max-width:960px){.hero-grid > div{max-width:none}}
+h1{
+  font-size:clamp(34px,5.6vw,64px);line-height:1.08;margin:22px 0 24px;font-weight:900;
+  text-wrap:balance;
+}
+h1 .accent{color:var(--ink)}
+.hl{
+  background:linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 54%,
+    var(--live) 54%,
+    var(--live) 92%,
+    transparent 92%
+  );
+  color:var(--ink);
+  padding:0 .14em;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+}
+.h1wrap{position:relative}
+canvas.blockfx{position:absolute;pointer-events:none;z-index:3}
+/* Headings start hidden ONLY when scripting is on, so the blocks are the
+   first thing you ever see. Without JS the .fx class is never added and
+   every heading renders normally. */
+.fx h1#headline, .fx section h2{opacity:0}
+@media(prefers-reduced-motion:reduce){ .fx h1#headline, .fx section h2{opacity:1} }
+.sub{font-size:16px;color:var(--ink-2);max-width:47ch;margin-bottom:32px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+
+/* ── hero film ── */
+/* Background, not a card: no frame, anchored to the right edge and scaled
+   past the viewport so the machine reads large. The left is masked to black
+   so the headline always sits on clean ground. */
+.herofilm{
+  /* Full width so there is no visible seam where the film ends; the
+     gradient below does the fading instead of a hard edge. */
+  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.herofilm video{
+  /* Sized explicitly and anchored right — 30% smaller than the previous
+     cover-fill. The clip is almost entirely black, so its edges blend into
+     the page rather than showing as a hard boundary. */
+  position:absolute;top:50%;left:72%;
+  width:74%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  transition:opacity .25s linear;
+}
+.herofilm::after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(to right, #000 0%, #000 34%, rgba(0,0,0,.78) 46%, rgba(0,0,0,.22) 66%, rgba(0,0,0,0) 100%),
+    linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 76%, #000 100%);
+}
+@media(max-width:900px){
+  .herofilm video{
+    inset:0;top:0;left:0;
+    width:100%;height:100%;min-width:0;
+    transform:none;
+    object-fit:contain;
+    object-position:center 30%;
+  }
+  .herofilm::after{
+    background:linear-gradient(to bottom,
+      #000 0%, rgba(0,0,0,.22) 16%, rgba(0,0,0,.5) 46%, rgba(0,0,0,.9) 64%, #000 80%);
+  }
+}
+@media(prefers-reduced-motion:reduce){ .herofilm video{opacity:.9} }
+
+/* ── sections ── */
+section{padding:100px 0;border-top:none;position:relative}
+section::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right, rgba(232,232,232,.18), transparent);
+}
+.eyebrow-row{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.eyebrow-row::after{content:"";height:1px;flex:1;background:var(--line)}
+.lede{font-size:18px;color:var(--ink);max-width:62ch;line-height:1.6}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ── stat strip ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);
+  border:1px solid var(--line-soft);margin-top:44px}
+@media(max-width:760px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--surface);padding:30px 26px}
+.stat .n{font-family:Doto,monospace;font-weight:900;font-size:42px;color:var(--ink);line-height:1}
+.stat .t{font-size:14px;color:var(--muted);margin-top:9px}
+
+/* ── section films ── */
+/* Same treatment as the hero: background, no frame, faded out toward the
+   text so the copy always sits on clean black. */
+.secfilm{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.secfilm video{
+  position:absolute;top:50%;left:70%;
+  width:62%;min-width:520px;
+  transform:translate(-50%,-50%);
+  opacity:0;transition:opacity .5s linear;
+}
+.secfilm::after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(to right, #000 0%, #000 32%, rgba(0,0,0,.72) 48%, rgba(0,0,0,.3) 70%, rgba(0,0,0,.6) 100%),
+    linear-gradient(to bottom, #000 0%, rgba(0,0,0,.1) 18%, rgba(0,0,0,.1) 78%, #000 100%);
+}
+section > .wrap{position:relative;z-index:2}
+@media(max-width:900px){
+  .secfilm video{
+    inset:0;top:0;left:0;
+    width:100%;height:100%;min-width:0;min-height:0;
+    transform:none;
+    object-fit:contain;
+    object-position:center 26%;
+  }
+  /* Stacked layout: fade top and bottom instead of left-to-right, so the
+     copy sits on solid black wherever it lands. */
+  .secfilm::after{
+    background:linear-gradient(to bottom,
+      #000 0%, rgba(0,0,0,.25) 14%, rgba(0,0,0,.45) 44%, rgba(0,0,0,.88) 62%, #000 78%);
+  }
+}
+@media(prefers-reduced-motion:reduce){ .secfilm video{opacity:.9} }
+
+/* ── figures ── */
+/* Diagram plays itself: nodes fade in, connectors draw. Only applied once JS
+   has armed it, so without scripting the figure renders complete. */
+/* Nothing here hides the diagram: the initial hidden state is set by JS, so
+   a page without scripting renders it complete and there is no cascade to
+   fight. Connectors are hidden by dash-offset, nodes by inline opacity. */
+#flowfig .fx-node{transition:opacity .45s ease}
+
+.fig{margin:34px 0 0;padding:0}
+.fig svg{width:100%;max-width:880px;height:auto;display:block;color:var(--ink-2)}
+.fig figcaption{
+  margin-top:16px;font-size:13px;color:var(--muted);max-width:60ch;line-height:1.6;
+}
+/* ── flow ── */
+.flow{display:grid;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);margin-top:40px}
+.step{background:var(--surface);padding:26px 28px;display:grid;grid-template-columns:56px 1fr auto;
+  gap:22px;align-items:start}
+@media(max-width:700px){.step{grid-template-columns:44px 1fr;gap:16px}.step .ms{display:none}}
+.step .k{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);padding-top:4px;letter-spacing:.1em}
+.step h3{font-size:19px;margin-bottom:5px}
+.step p{margin:0;font-size:15px}
+.step .ms{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);
+  white-space:nowrap;padding-top:6px;letter-spacing:.08em}
+
+/* ── capability grid ── */
+.caps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);
+  border:1px solid var(--line-soft);margin-top:42px}
+@media(max-width:900px){.caps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.caps{grid-template-columns:1fr}}
+.cap{background:var(--surface);padding:28px 26px;transition:background .25s}
+.cap:hover{background:var(--surface-2)}
+.cap .ico{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);
+  letter-spacing:.16em;margin-bottom:14px}
+.cap h3{font-size:18px}
+.cap p{font-size:14.5px;margin:0}
+
+/* ── split ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+@media(max-width:880px){.split{grid-template-columns:1fr;gap:36px}}
+.card{background:var(--surface-2);border:1px solid var(--line);padding:30px 28px;border-radius:4px}
+.card.hi{border-color:var(--line-visible)}
+.card ul{margin:16px 0 0;padding-left:0;list-style:none}
+.card li{font-size:14.5px;color:var(--ink-2);padding:7px 0 7px 22px;position:relative}
+.card li::before{content:"→";position:absolute;left:0;color:var(--muted);
+  font-family:"Space Mono",monospace;font-size:12px}
+
+/* ── cta ── */
+.cta{text-align:center;padding:110px 0}
+.cta h2{margin-bottom:14px}
+.cta p{margin-left:auto;margin-right:auto}
+footer{border-top:1px solid var(--line-soft);padding:38px 0;
+  font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted);
+  display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;letter-spacing:.08em}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+
+<canvas id="stage" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<nav>
+  <div class="inner">
+    <a class="brand" href="#top"><span class="dot"></span>AGENT 47</a>
+    <div class="navlinks">
+      <a href="#how">What happens</a>
+      <a href="#what">Capabilities</a>
+      <a href="#data">Your data</a>
+      <a href="#who">Who it's for</a>
+    </div>
+    <a class="btn" href="#contact">Request a demo</a>
+  </div>
+</nav>
+
+<div id="top"></div>
+
+<header class="hero">
+    <div class="herofilm" aria-hidden="true">
+      <video id="herovid" class="filmv" muted playsinline preload="auto"
+             poster="hero-poster.jpg">
+        <source src="hero.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <div class="wrap hero-grid">
+    <div>
+      <div class="label">Agent 47 &nbsp;·&nbsp; AI Receptionist</div>
+      <div class="h1wrap">
+        <h1 id="headline"><span class="hl">Your phone stops</span><br>going to voicemail.</h1>
+      </div>
+      <p class="sub">An AI receptionist that answers every call and text, knows your business, books the appointment, and hands you the ones that need a human.</p>
+      <div class="cta-row">
+        <a class="btn" href="#contact">Request a demo</a>
+        <a class="btn ghost" href="#how">See what happens</a>
+      </div>
+    </div>
+
+</header>
+
+<section id="problem">
+  <div class="secfilm" aria-hidden="true">
+    <video class="filmv" muted playsinline preload="none" poster="problem-poster.jpg">
+      <source src="problem.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label dim">The problem</span></div>
+    <h2><span class="hl">Most small businesses</span><br>lose work while they're working.</h2>
+    <p class="lede">The phone rings while you're under a car or with a customer. It goes to voicemail. They don't leave one &mdash; they call the next business on the list.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">24/7</div><div class="t">Answers at 2am, on weekends, and during your busiest hour</div></div>
+      <div class="stat"><div class="n">&lt;1s</div><div class="t">Common questions answered instantly, with no AI call at all</div></div>
+      <div class="stat"><div class="n">∞</div><div class="t">Never engaged, never on another line, never off sick</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label">What happens</span></div>
+    <h2><span class="hl">Your phone rings.</span><br>Then what?</h2>
+    <p>Four ways a call can end. None of them is voicemail.</p>
+    <figure class="fig" id="flowfig">
+      <svg viewBox="0 0 880 420" role="img" preserveAspectRatio="xMidYMid meet"
+           aria-label="Someone calls, Agent 47 answers, and the call ends in one of four ways: the job is booked, their question is answered, a message is taken, or they are put through to you. Everything lands in one dashboard.">
+        <defs>
+          <marker id="w" viewBox="0 0 10 10" refX="9"
+                  markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" refY="5" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+          <marker id="wa" viewBox="0 0 10 10" refX="9"
+                  markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" refY="5" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#E5690F"/>
+          </marker>
+        </defs>
+
+        <g class="fx-node" data-step="0">
+          <rect x="20" y="150" width="150" height="60" rx="3" stroke="currentColor" fill="none" opacity=".55"/>
+          <text x="42" y="180" font-size="13" fill="currentColor">Someone calls</text>
+          <text x="42" y="198" font-size="11" fill="currentColor" opacity=".5">any hour, any day</text>
+        </g>
+
+        <line class="fx-line" data-step="1" x1="170" y1="180" x2="252" y2="180"
+              stroke="#E5690F" stroke-width="1.6" marker-end="url(#wa)"/>
+
+        <g class="fx-node" data-step="2">
+          <rect x="260" y="150" width="160" height="60" rx="3" stroke="#E5690F" fill="none"/>
+          <text x="284" y="180" font-size="13" fill="#E5690F">Agent 47 answers</text>
+          <text x="284" y="198" font-size="11" fill="currentColor" opacity=".5">picks up every time</text>
+        </g>
+
+        <path class="fx-line" data-step="3" d="M420 180 H470 V56 H548"  stroke="currentColor" fill="none" stroke-width="1.4" opacity=".6" marker-end="url(#w)"/>
+        <path class="fx-line" data-step="4" d="M420 180 H470 V138 H548" stroke="currentColor" fill="none" stroke-width="1.4" opacity=".6" marker-end="url(#w)"/>
+        <path class="fx-line" data-step="5" d="M420 180 H470 V222 H548" stroke="currentColor" fill="none" stroke-width="1.4" opacity=".6" marker-end="url(#w)"/>
+        <path class="fx-line" data-step="6" d="M420 180 H470 V304 H548" stroke="currentColor" fill="none" stroke-width="1.4" opacity=".6" marker-end="url(#w)"/>
+
+        <g class="fx-node" data-step="3">
+          <rect x="556" y="28" width="300" height="56" rx="3" stroke="currentColor" fill="none" opacity=".55"/>
+          <text x="578" y="54" font-size="13" fill="currentColor">Books the job</text>
+          <text x="578" y="72" font-size="11" fill="currentColor" opacity=".5">straight into your diary</text>
+        </g>
+        <g class="fx-node" data-step="4">
+          <rect x="556" y="110" width="300" height="56" rx="3" stroke="currentColor" fill="none" opacity=".55"/>
+          <text x="578" y="136" font-size="13" fill="currentColor">Answers their question</text>
+          <text x="578" y="154" font-size="11" fill="currentColor" opacity=".5">hours, prices, what to bring</text>
+        </g>
+        <g class="fx-node" data-step="5">
+          <rect x="556" y="194" width="300" height="56" rx="3" stroke="currentColor" fill="none" opacity=".55"/>
+          <text x="578" y="220" font-size="13" fill="currentColor">Takes a message</text>
+          <text x="578" y="238" font-size="11" fill="currentColor" opacity=".5">with their number and the reason</text>
+        </g>
+        <g class="fx-node" data-step="6">
+          <rect x="556" y="276" width="300" height="56" rx="3" stroke="currentColor" fill="none" opacity=".55"/>
+          <text x="578" y="302" font-size="13" fill="currentColor">Puts them through to you</text>
+          <text x="578" y="320" font-size="11" fill="currentColor" opacity=".5">when they ask, or it is urgent</text>
+        </g>
+
+        <path class="fx-line" data-step="7" d="M706 332 V372 H340 V216"
+              stroke="currentColor" fill="none" stroke-width="1.2" opacity=".45" stroke-dasharray="4 5" marker-end="url(#w)"/>
+        <g class="fx-node" data-step="7">
+          <text x="360" y="392" font-size="11" fill="currentColor" opacity=".55">
+            every call, message and booking lands in one place
+          </text>
+        </g>
+      </svg>
+      <figcaption>Your phone stops ringing out. Whatever the caller wanted, you get the job or the message &mdash; never a missed call.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label">Capabilities</span></div>
+    <h2><span class="hl">What it actually</span><br>does.</h2>
+    <div class="caps">
+      <div class="cap"><div class="ico">[ VOICE ]</div><h3>Answers the phone</h3><p>Real calls, real number. No menu tree.</p></div>
+      <div class="cap"><div class="ico">[ SMS ]</div><h3>Texts back</h3><p>Missed call becomes a text, not a lost lead.</p></div>
+      <div class="cap"><div class="ico">[ BOOK ]</div><h3>Books appointments</h3><p>Checks the diary, confirms on the call.</p></div>
+      <div class="cap"><div class="ico">[ KNOW ]</div><h3>Learns your business</h3><p>Answers from your site, not a guess.</p></div>
+      <div class="cap"><div class="ico">[ MULTI ]</div><h3>Speaks as your business</h3><p>Your name, your hours, your prices.</p></div>
+      <div class="cap"><div class="ico">[ LOG ]</div><h3>Shows you everything</h3><p>Every call and booking in one dashboard.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="data">
+  <div class="secfilm" aria-hidden="true">
+    <video class="filmv" muted playsinline preload="none" poster="data-poster.jpg">
+      <source src="data.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label">Your data</span></div>
+    <h2><span class="hl">Hosted</span><br>by default.</h2>
+    <p>Set up in a day. Self-hosting is available for clients whose rules require it &mdash; if nobody has told you that you need it, you do not.</p>
+
+    <figure class="fig">
+      <svg viewBox="0 0 880 300" role="img" preserveAspectRatio="xMidYMid meet"
+           aria-label="Comparison: hosted sends the conversation to an outside model provider, self-hosted keeps it on a machine inside your own network.">
+        <defs>
+          <marker id="ar2" viewBox="0 0 10 10" refX="9"
+                  markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" refY="5" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+          </marker>
+          <marker id="ar2a" viewBox="0 0 10 10" refX="9"
+                  markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" refY="5" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="#E5690F"/>
+          </marker>
+        </defs>
+
+        <text x="30" y="26" font-size="11" fill="currentColor" opacity=".6">HOSTED &#183; THE DEFAULT</text>
+        <g stroke="currentColor" fill="none" opacity=".55">
+          <rect x="30" y="44" width="150" height="52" rx="3"/>
+          <rect x="280" y="44" width="150" height="52" rx="3"/>
+          <rect x="530" y="44" width="180" height="52" rx="3"/>
+          <line x1="180" y1="70" x2="272" y2="70" marker-end="url(#ar2)"/>
+          <line x1="430" y1="70" x2="522" y2="70" marker-end="url(#ar2)"/>
+        </g>
+        <g font-size="13" fill="currentColor">
+          <text x="52" y="75">Caller</text>
+          <text x="302" y="75">Agent 47</text>
+          <text x="552" y="75">Model provider</text>
+        </g>
+        <text x="552" y="118" font-size="11" fill="currentColor" opacity=".5">outside your network</text>
+        <line x1="516" y1="34" x2="516" y2="130" stroke="currentColor" opacity=".3" stroke-dasharray="3 4"/>
+        <text x="524" y="30" font-size="10" fill="currentColor" opacity=".45">leaves the building</text>
+
+        <line x1="30" y1="176" x2="850" y2="176" stroke="currentColor" opacity=".14"/>
+
+        <text x="30" y="212" font-size="11" fill="#E5690F" opacity=".9">SELF-HOSTED &#183; ON REQUEST</text>
+        <g stroke="currentColor" fill="none" opacity=".55">
+          <rect x="30" y="230" width="150" height="52" rx="3"/>
+          <line x1="180" y1="256" x2="272" y2="256" marker-end="url(#ar2)"/>
+        </g>
+        <g stroke="#E5690F" fill="none" opacity=".75">
+          <rect x="280" y="230" width="150" height="52" rx="3"/>
+          <rect x="530" y="230" width="180" height="52" rx="3"/>
+          <line x1="430" y1="256" x2="522" y2="256" marker-end="url(#ar2a)"/>
+          <rect x="262" y="212" width="466" height="88" rx="4" stroke-dasharray="4 5" opacity=".5"/>
+        </g>
+        <g font-size="13" fill="currentColor">
+          <text x="52" y="261">Caller</text>
+          <text x="302" y="261">Agent 47</text>
+          <text x="552" y="261">Model on your box</text>
+        </g>
+        <text x="736" y="262" font-size="11" fill="#E5690F" opacity=".85">nothing leaves</text>
+      </svg>
+      <figcaption>The only difference is the last hop. Hosted sends the conversation to an outside provider; self-hosted keeps it on hardware you control &mdash; at the cost of a weaker model and real hardware to run.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="who">
+  <div class="secfilm" aria-hidden="true">
+    <video class="filmv" muted playsinline preload="none" poster="who-poster.jpg">
+      <source src="who.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label">Who it's for</span></div>
+    <h2><span class="hl">Businesses where the phone</span><br>is the front door.</h2>
+    <p>Where the person answering is also the person doing the work, and a missed call is a lost job. Trades. Clinics and salons. Rentals and hire.</p>
+  </div>
+</section>
+
+<section class="cta" id="contact">
+  <div class="wrap reveal">
+    <div class="label" style="justify-content:center">Currently in development</div>
+    <h2 style="margin-top:20px"><span class="hl">Want to see it</span><br>take a call?</h2>
+    <p style="max-width:48ch">We're building this now with a small number of businesses. If your phone is costing you work, we'd like to hear.</p>
+    <div class="cta-row" style="justify-content:center;margin-top:26px">
+      <a class="btn" href="mailto:hello@agent47.ai?subject=Agent%2047%20—%20AI%20Receptionist%20demo">Get in touch</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;width:100%">
+    <span>AGENT 47 · AI RECEPTIONIST</span>
+    <span>IN DEVELOPMENT · 2026</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── scroll reveals ── */
+  var obs = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, {threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+
+  /* ── Flow diagram plays itself ────────────────────────────────────
+     The picture shows four possible endings; the animation shows a call
+     actually moving through them. Connectors draw with dash-offset,
+     nodes fade in behind their own arrow. Replays when the section is
+     re-entered, same rule as the films. */
+  (function(){
+    var fig = document.getElementById('flowfig');
+    if(!fig) return;
+    var section = fig.closest('section');
+    if(!section) return;
+
+    var nodes = [].slice.call(fig.querySelectorAll('.fx-node'));
+    var lines = [].slice.call(fig.querySelectorAll('.fx-line'));
+
+    if(reduce){ return; }              /* leave it fully drawn */
+    nodes.forEach(function(n){ n.style.opacity = '0'; });
+
+    /* Each connector is stroked from nothing using its own length. */
+    lines.forEach(function(l){
+      var len = 0;
+      try { len = l.getTotalLength(); } catch(e){ len = 600; }
+      l._len = len;
+      l.style.strokeDasharray = len + ' ' + len;
+      l.style.strokeDashoffset = len;
+    });
+
+    var STEP = 190, DRAW = 460, timers = [];
+
+    function reset(){
+      timers.forEach(clearTimeout); timers = [];
+      nodes.forEach(function(n){ n.style.opacity = '0'; });
+      lines.forEach(function(l){
+        l.style.transition = 'none';
+        l.style.strokeDashoffset = l._len;
+      });
+      /* force a reflow so the reset is committed before the run below */
+      void fig.offsetWidth;
+    }
+
+    function run(){
+      reset();
+      var maxStep = 7;
+      for(var step = 0; step <= maxStep; step++){
+        (function(st){
+          timers.push(setTimeout(function(){
+            lines.filter(function(l){ return +l.dataset.step === st; })
+                 .forEach(function(l){
+                    l.style.transition = 'stroke-dashoffset ' + DRAW + 'ms ease-out';
+                    l.style.strokeDashoffset = '0';
+                 });
+            nodes.filter(function(n){ return +n.dataset.step === st; })
+                 .forEach(function(n){ n.style.opacity = '1'; });
+          }, st * STEP));
+        })(step);
+      }
+    }
+
+    var primed = false, hasLeft = false;
+    new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          if(!primed){ primed = true; run(); }
+          else if(hasLeft){ hasLeft = false; run(); }
+        } else { hasLeft = true; }
+      });
+    }, {threshold:0.3}).observe(section);
+
+    /* Never leave the diagram half-drawn if something goes wrong. */
+    setTimeout(function(){
+      if(!primed){
+        nodes.forEach(function(n){ n.style.opacity = '1'; });
+        lines.forEach(function(l){ l.style.strokeDashoffset = '0'; });
+      }
+    }, 6000);
+  })();
+
+  /* ── Films ────────────────────────────────────────────────────────
+     One implementation for the hero and every section clip. Each plays
+     once from 0.1s when its section scrolls into view, holds on its final
+     frame, and replays only after the section has genuinely left the
+     viewport — so scroll jitter near the boundary cannot retrigger it.
+     Each stays invisible until it is past the start point, so the opening
+     frames are never seen. */
+  (function(){
+    var START = 0.1;
+    if(reduce) return;
+
+    document.querySelectorAll('video.filmv').forEach(function(v){
+      var host = v.closest('.herofilm, .secfilm');
+      var section = v.closest('header.hero, section');
+      if(!host || !section) return;
+
+      var shown = false, hasLeft = false, primed = false;
+
+      function show(){ if(!shown){ shown = true; v.style.opacity = '.9'; } }
+      function toStart(){
+        if(Math.abs(v.currentTime - START) > 0.02){
+          try { v.currentTime = START; } catch(e){}
+        }
+      }
+      function run(){
+        /* preload="none" on the section clips means metadata may not be
+           there yet on the first pass; load it, then seek and play. */
+        if(v.readyState < 1){
+          v.addEventListener('loadedmetadata', function(){ toStart(); play(); }, {once:true});
+          v.load();
+        } else { toStart(); play(); }
+      }
+      function play(){
+        var pr = v.play();
+        if(pr && pr.catch) pr.catch(function(){ show(); });
+      }
+
+      v.addEventListener('seeked', show, {once:true});
+      v.addEventListener('timeupdate', function(){ if(v.currentTime >= START) show(); });
+
+      new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){
+            if(!primed){ primed = true; run(); }
+            else if(hasLeft){ hasLeft = false; run(); }
+          } else {
+            hasLeft = true;
+          }
+        });
+      }, {threshold:0.35}).observe(section);
+
+      /* Never leave a section looking empty if playback is refused. */
+      setTimeout(show, 4000);
+    });
+  })();
+
+  /* ── Scroll-driven background waveform ────────────────────────────
+     The reference scrubs a filmed product as you scroll. We have no
+     product to film — the product IS the call. So a single voice
+     waveform runs the length of the page and changes character per
+     section: ringing, then flatlined on the missed-call section,
+     stepping through the router, full and busy across capabilities,
+     and settling at the end. */
+  var stage = document.getElementById('stage'), sx = stage.getContext('2d');
+  var DPR = Math.min(devicePixelRatio || 1, 1.6);
+  var sw = 0, sh = 0;
+  function sizeStage(){
+    sw = stage.clientWidth; sh = stage.clientHeight;
+    stage.width = Math.floor(sw*DPR); stage.height = Math.floor(sh*DPR);
+    sx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  sizeStage(); addEventListener('resize', sizeStage);
+
+  /* Each stop: [scrollProgress, amplitude, density, flat?] */
+  var STOPS = [
+    [0.00, 0.30, 1.0, 0],   /* hero — steady ring    */
+    [0.16, 0.06, 1.0, 1],   /* problem — flatline    */
+    [0.34, 0.55, 1.6, 0],   /* router — stepping     */
+    [0.56, 0.85, 2.3, 0],   /* capabilities — busy   */
+    [0.76, 0.40, 1.2, 0],   /* data — contained      */
+    [1.00, 0.16, 0.8, 0]    /* close — settling      */
+  ];
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function sample(pr){
+    for(var i=0;i<STOPS.length-1;i++){
+      var a=STOPS[i], b=STOPS[i+1];
+      if(pr>=a[0] && pr<=b[0]){
+        var t=(pr-a[0])/(b[0]-a[0]||1);
+        t = t*t*(3-2*t);                       /* smoothstep */
+        return {amp:lerp(a[1],b[1],t), den:lerp(a[2],b[2],t), flat:lerp(a[3],b[3],t)};
+      }
+    }
+    var L=STOPS[STOPS.length-1];
+    return {amp:L[1], den:L[2], flat:L[3]};
+  }
+
+  var target = 0, cur = 0, phase = 0;
+  function onScroll(){
+    var max = document.body.scrollHeight - innerHeight;
+    target = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+  }
+  addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  function paint(){
+    cur += (target - cur) * 0.07;             /* eased follow, no jitter */
+    var st = sample(cur);
+    phase += 0.006 + cur * 0.02;
+
+    sx.clearRect(0,0,sw,sh);
+    var mid = sh * 0.52;
+    var step = 7, w = 2.5;
+
+    for(var x = 0; x < sw; x += step){
+      var u = x / sw;
+      var n =
+        Math.sin(u*9*st.den + phase*3.0) *
+        Math.sin(u*23*st.den - phase*1.7) *
+        Math.sin(phase*0.8 + u*4);
+      /* flatline pulls everything toward a hairline, leaving a faint blip */
+      var blip = Math.max(0, 1 - Math.abs(u - (phase*0.11 % 1)) * 26);
+      var mag = Math.abs(n) * st.amp * sh * 0.34 * (1 - st.flat)
+              + blip * st.flat * sh * 0.10
+              + 0.6;
+      var a = 0.05 + Math.abs(n) * st.amp * 0.42 * (1 - st.flat) + blip*st.flat*0.5;
+      sx.fillStyle = 'rgba(229,105,15,' + Math.min(a, 0.5).toFixed(3) + ')';
+      sx.fillRect(x, mid - mag/2, w, mag);
+    }
+
+    /* centre line, brightest where the waveform is quietest */
+    sx.fillStyle = 'rgba(229,105,15,' + (0.10 + st.flat*0.16).toFixed(3) + ')';
+    sx.fillRect(0, mid - 0.5, sw, 1);
+
+    requestAnimationFrame(paint);
+  }
+  /* ── Blocks assemble into headings ───────────────────────────────
+     Ra.One-style: letters fly together out of scattered cubes. It fits
+     because the display face is already a dot-matrix — the blocks ARE
+     the letterforms, not an effect painted over them.
+
+     Runs when a heading scrolls INTO VIEW, not on page load, and replays
+     each time it re-enters. A one-shot on load is over in a second and
+     is missed entirely if the tab was not in front yet. Real text stays
+     in the DOM the whole time for screen readers. */
+  function makeAssembler(el){
+    var cv2 = document.createElement('canvas');
+    cv2.setAttribute('aria-hidden','true');
+    cv2.className = 'blockfx';
+    var holder = el.parentNode;
+    if(getComputedStyle(holder).position === 'static') holder.style.position = 'relative';
+    holder.insertBefore(cv2, el);
+    var ctx = cv2.getContext('2d');
+    var running = false, drawn = false;
+
+    return function run(instant){
+      if(running || reduce) return;
+      var cs = getComputedStyle(el);
+      var er = el.getBoundingClientRect(), hr = holder.getBoundingClientRect();
+      var W = Math.ceil(er.width), H = Math.ceil(er.height);
+      if(W < 40 || H < 18) { el.style.opacity='1'; return; }
+
+      var D = Math.min(devicePixelRatio || 1, 2);
+      cv2.width = W*D; cv2.height = H*D;
+      cv2.style.cssText = 'position:absolute;pointer-events:none;z-index:3;transition:none;' +
+        'left:' + (er.left-hr.left) + 'px;top:' + (er.top-hr.top) + 'px;' +
+        'width:' + W + 'px;height:' + H + 'px;opacity:1;';
+
+      var off = document.createElement('canvas');
+      off.width = W*D; off.height = H*D;
+      var oc = off.getContext('2d');
+      oc.scale(D,D);
+      oc.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      oc.fillStyle = '#fff';
+      oc.textBaseline = 'alphabetic';
+
+      /* Ask the BROWSER where each line actually sits, rather than
+         re-implementing line breaking. Measuring it myself was wrong three
+         ways: every line landed ~9px low, textContent flattens <br> with no
+         space ("stopsgoing"), and h2 uses text-wrap:balance, which a greedy
+         wrap does not reproduce. Reading real line boxes means the blocks
+         land exactly where the text will be, so the handoff is invisible. */
+      var fs = parseFloat(cs.fontSize);
+      var lh = parseFloat(cs.lineHeight) || fs*1.15;
+      var er2 = el.getBoundingClientRect();
+      var lines = [];
+      var walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+      var node, prevTop = null, cur = null;
+      while((node = walk.nextNode())){
+        var inHl = !!(node.parentElement && node.parentElement.closest('.hl'));
+        for(var ci=0; ci<node.length; ci++){
+          var rg = document.createRange();
+          rg.setStart(node, ci); rg.setEnd(node, ci+1);
+          var cb = rg.getBoundingClientRect();
+          if(!cb.height) continue;
+          if(prevTop === null || Math.abs(cb.top - prevTop) > 2){
+            cur = {chars:[], top: cb.top - er2.top, left: cb.left - er2.left,
+                   right: cb.right - er2.left, hl: inHl};
+            lines.push(cur); prevTop = cb.top;
+          }
+          /* Store every glyph's own x. fillText ignores CSS letter-spacing,
+             so drawing a whole line as one string drifts further right with
+             each character. Per-glyph placement is exact no matter what the
+             CSS does to spacing or kerning. */
+          cur.chars.push({ch: node.data[ci], x: cb.left - er2.left});
+          cur.right = cb.right - er2.left;
+        }
+      }
+      if(!lines.length || !lines[0].chars.length){ el.style.opacity='1'; return; }
+
+      /* Get the browser's OWN baseline rather than deriving one from canvas
+         font metrics. A zero-height inline-block aligned to the baseline has
+         top === bottom === the baseline of the line it sits on, so this is
+         exact. Canvas metrics for a variable face were landing ~2-3px off,
+         which is what made the text jump when the blocks handed over. */
+      var probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      el.insertBefore(probe, el.firstChild);
+      var pr = probe.getBoundingClientRect();
+      var baseline0 = pr.top - er2.top;
+      probe.remove();
+      /* offset from a line box's top to its baseline is constant per element */
+      var baseOffset = baseline0 - lines[0].top;
+
+      lines.forEach(function(L){
+        var baseY = L.top + baseOffset;
+        if(L.hl){
+          /* marker stripe over the lower part of the line, as in the CSS */
+          oc.fillStyle = '#E5690F';
+          oc.fillRect(L.left - fs*0.14, L.top + lh*0.54,
+                      (L.right - L.left) + fs*0.28, lh*0.38);
+        }
+        oc.fillStyle = '#fff';
+        for(var gi=0; gi<L.chars.length; gi++){
+          oc.fillText(L.chars[gi].ch, L.chars[gi].x, baseY);
+        }
+      });
+
+      var img;
+      try { img = oc.getImageData(0,0,W*D,H*D).data; }
+      catch(e){ el.style.opacity='1'; return; }
+
+      /* Doto is a dot-matrix face: its glyphs are already discrete dots with
+         gaps between them. Testing a single pixel per grid cell meant samples
+         kept landing in those gaps, so whole chunks of every letter were
+         never emitted and the text came out shredded. Test the WHOLE cell and
+         emit a block if any pixel in it is inked. */
+      var GAP = Math.max(2, Math.round(fs/16));
+      var blocks = [];
+      var stepPx = Math.max(1, Math.round(GAP*D));
+      var CW = W*D, CH = H*D;
+      for(var gy = 0; gy < CH; gy += stepPx){
+        for(var gx = 0; gx < CW; gx += stepPx){
+          var hit = 0, rSum = 0, gSum = 0, bSum = 0, cnt = 0;
+          var yMax = Math.min(gy + stepPx, CH), xMax = Math.min(gx + stepPx, CW);
+          for(var yy = gy; yy < yMax; yy++){
+            var rowOff = yy * CW;
+            for(var xx = gx; xx < xMax; xx++){
+              var o = (rowOff + xx) * 4;
+              if(img[o+3] > 90){
+                hit = 1; rSum += img[o]; gSum += img[o+1]; bSum += img[o+2]; cnt++;
+              }
+            }
+          }
+          if(hit){
+            var px = gx/D, py = gy/D;
+            blocks.push({
+              x: px, y: py,
+              sx: px + (Math.random()-0.5)*W*1.4,
+              sy: py + (Math.random()-0.5)*H*6,
+              d: Math.random()*0.38,
+              c: Math.round(rSum/cnt) + ',' + Math.round(gSum/cnt) + ',' + Math.round(bSum/cnt)
+            });
+          }
+        }
+      }
+      if(!blocks.length){ el.style.opacity='1'; return; }
+
+      running = true;
+      el.style.transition = 'none';
+      el.style.opacity = '0';
+      // Failsafe: never leave a heading invisible if the animation stalls.
+      clearTimeout(el._fxGuard);
+      el._fxGuard = setTimeout(function(){
+        /* Only if the animation never completed: fall back to real text. */
+        if(!drawn){ el.style.opacity = '1'; cv2.style.opacity = '0'; }
+        running = false;
+      }, 2600);
+      cv2.style.opacity = '1';
+      var size = GAP, t0 = null, DUR = instant ? 1 : 1050, FOCUS_AT = 0.40;
+      function step(ts){
+        if(t0===null) t0 = ts;
+        var e = Math.min(1,(ts-t0)/DUR);
+        ctx.setTransform(D,0,0,D,0,0);
+        ctx.clearRect(0,0,W,H);
+        for(var i=0;i<blocks.length;i++){
+          var b = blocks[i];
+          var lp = Math.min(1, Math.max(0,(e-b.d)/(1-b.d)));
+          var k = 1 - Math.pow(1-lp, 4);
+          /* Brightness ramps on a cube, not linearly: blocks stay faint for most
+             of the flight and only come up to full as they arrive. A linear
+             ramp had them at ~60% brightness halfway across, which made the
+             whole heading glow while it was still scattered. Fully assembled
+             is still 1.0, unchanged. */
+          /* In-flight brightness scaled to 40% of the previous curve, with a
+             steep term that only bites at the very end so the fully-assembled
+             state still lands at exactly 1.0. */
+          /* Flat and near-invisible for the whole flight: a very high
+             exponent keeps brightness at its starting value right through
+             90% of the journey, then lifts to full only in the last stretch.
+             Assembled is still exactly 1.0. */
+          var bright = Math.min(1, 0.024 + 0.976*Math.pow(k, 64));
+          ctx.fillStyle = 'rgba(' + b.c + ',' + bright.toFixed(3) + ')';
+          ctx.fillRect(b.sx+(b.x-b.sx)*k, b.sy+(b.y-b.sy)*k, size, size);
+        }
+        /* Focus pass: fade the true glyph rendering in over the tail of the
+           animation so the coarse mosaic resolves into type gradually. */
+        if(e > FOCUS_AT){
+          var sharp = (e - FOCUS_AT) / (1 - FOCUS_AT);
+          ctx.globalAlpha = sharp * sharp;         /* ease in */
+          ctx.drawImage(off, 0, 0, W, H);
+          ctx.globalAlpha = 1;
+        }
+        if(e<1) requestAnimationFrame(step);
+        else {
+          clearTimeout(el._fxGuard);
+          /* By now the focus pass has already drawn the glyphs at full
+             opacity over the mosaic, so the canvas is pixel-identical to the
+             DOM text and the swap changes nothing on screen. */
+          drawn = true;
+          /* Same frame as the final paint — no requestAnimationFrame hop.
+             Deferring the swap by even one frame (~16ms) was the last real
+             delay in the chain; there is nothing left after this. */
+          el.style.opacity = '1';
+          cv2.style.opacity = '0';
+          running = false;
+        }
+      }
+      requestAnimationFrame(step);
+    };
+  }
+
+  function initBlockFx(){
+    var heads = [document.getElementById('headline')];
+    document.querySelectorAll('section h2').forEach(function(h){ heads.push(h); });
+    heads.filter(Boolean).forEach(function(el){
+      if(reduce) return;
+      var run = makeAssembler(el);
+      var io = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting) run(); });
+      }, {threshold:.55});
+      io.observe(el);
+      /* No resize redraw needed: after the handoff the real text is what is
+         on screen, and the browser reflows it itself. */
+    });
+  }
+
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(function(){ setTimeout(initBlockFx, 60); });
+  } else { setTimeout(initBlockFx, 400); }
+
+  /* Nothing may stay invisible because an effect failed. */
+  setTimeout(function(){
+    document.querySelectorAll('h1#headline, section h2').forEach(function(h){
+      if(getComputedStyle(h).opacity === '0') h.style.opacity = '1';
+    });
+  }, 6000);
+
+  if(!reduce){ paint(); }
+  else {
+    /* Reduced motion: draw one static, quiet frame instead of animating. */
+    var st0 = sample(0), mid0 = sh*0.52;
+    sx.fillStyle = 'rgba(229,105,15,0.10)';
+    sx.fillRect(0, mid0-0.5, sw, 1);
+  }
+})();
+</script>
