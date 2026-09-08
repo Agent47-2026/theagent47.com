@@ -106,6 +106,25 @@ nav .inner{
 .btn:hover,.btn:focus-visible{background:var(--ink);color:var(--void)}
 .btn.ghost{border-color:var(--line-visible);color:var(--muted)}
 .btn.ghost:hover,.btn.ghost:focus-visible{border-color:var(--ink-2);background:transparent;color:var(--ink)}
+
+  /* -- signup form -- */
+  .signup{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  .signup input[type=email]{
+    font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.02em;
+    padding:12px 16px;min-width:300px;border-radius:2px;
+    border:1px solid var(--line-visible);background:var(--surface);color:var(--ink);
+    transition:border-color .22s;
+  }
+  .signup input[type=email]::placeholder{color:var(--dim)}
+  .signup input[type=email]:focus{outline:none;border-color:var(--live)}
+  .signup .btn{border-color:var(--live);color:var(--live)}
+  .signup .btn:hover,.signup .btn:focus-visible{background:var(--live);color:var(--void)}
+  .signup-note{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:16px}
+  .form-msg{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;margin-top:18px;min-height:18px}
+  .form-msg.ok{color:var(--success)}
+  .form-msg.err{color:var(--live)}
+  .hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}
+  @media(max-width:560px){.signup input[type=email]{min-width:0;width:100%}.signup .btn{width:100%}}
 :focus-visible{outline:2px solid var(--live);outline-offset:3px}
 
 /* ── hero ── */
@@ -538,9 +557,17 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
     <div class="label" style="justify-content:center">Currently in development</div>
     <h2 style="margin-top:20px"><span class="hl">Want to see it</span><br>take a call?</h2>
     <p style="max-width:48ch">We're building this now with a small number of businesses. If your phone is costing you work, we'd like to hear.</p>
-    <div class="cta-row" style="justify-content:center;margin-top:26px">
-      <a class="btn" href="mailto:contact@theagent47.com?subject=Agent%2047%20—%20AI%20Receptionist%20demo">Get in touch</a>
-    </div>
+    <form class="signup" id="signup" novalidate>
+      <input type="hidden" name="_subject" value="Agent 47 - new demo request">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
+      <label for="signup-email" class="hp">Your email address</label>
+      <input id="signup-email" type="email" name="email" placeholder="you@yourbusiness.com" required autocomplete="email">
+      <button class="btn" type="submit">Request a demo</button>
+    </form>
+    <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+    <p class="signup-note">No spam. We'll only contact you about the demo.</p>
   </div>
 </section>
 
@@ -1011,5 +1038,31 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
     sx.fillStyle = 'rgba(229,105,15,0.10)';
     sx.fillRect(0, mid0-0.5, sw, 1);
   }
+})();
+</script>
+
+<script>
+(function(){
+  var f=document.getElementById('signup'), m=document.getElementById('form-msg');
+  if(!f) return;
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var email=f.email.value.trim(), btn=f.querySelector('button');
+    m.className='form-msg';
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
+      m.textContent='Please enter a valid email address.'; m.classList.add('err'); return;
+    }
+    btn.disabled=true; var label=btn.textContent; btn.textContent='Sending...';
+    fetch('https://formsubmit.co/ajax/admin@exotichutllc.com',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify(Object.fromEntries(new FormData(f)))
+    }).then(function(r){return r.json()}).then(function(d){
+      if(d.success===true||d.success==='true'){ f.reset(); m.textContent="Thanks - we'll be in touch shortly."; m.classList.add('ok'); }
+      else { m.textContent='Something went wrong. Please try again.'; m.classList.add('err'); }
+    }).catch(function(){
+      m.textContent='Network error. Please try again.'; m.classList.add('err');
+    }).finally(function(){ btn.disabled=false; btn.textContent=label; });
+  });
 })();
 </script>
