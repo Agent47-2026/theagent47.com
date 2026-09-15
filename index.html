@@ -343,6 +343,16 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   video.filmv::-webkit-media-controls{display:none!important}
   video.filmv::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
   video.filmv::-webkit-media-controls-panel{display:none!important}
+  /* Touch devices (phones/tablets): no <video> at all — mobile browsers
+     block autoplay (Low Power Mode / Data Saver) and paint a play button on
+     any paused video, which no pseudo-element reliably hides on modern iOS.
+     So drop the video element and show the poster still image instead. A PC
+     with a mouse keeps the video (this query only matches touch pointers). */
+  @media (hover: none) and (pointer: coarse){
+    .herofilm video, .secfilm video{display:none!important}
+    .herofilm{background:#000 url(/hero-poster.jpg) center/cover no-repeat}
+    .secfilm{display:none}          /* decorative section films: skip on touch */
+  }
 </style>
 
 <canvas id="stage" aria-hidden="true"></canvas>
