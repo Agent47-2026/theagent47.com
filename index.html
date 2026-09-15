@@ -336,6 +336,13 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   .reveal{opacity:1;transform:none}
   html{scroll-behavior:auto}
 }
+  /* Decorative films: never show the browser's play button. When autoplay is
+     blocked (iOS Low Power Mode, Android Data Saver) fall back to the poster
+     still image silently, instead of overlaying a manual play control. */
+  video.filmv{pointer-events:none}
+  video.filmv::-webkit-media-controls{display:none!important}
+  video.filmv::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
+  video.filmv::-webkit-media-controls-panel{display:none!important}
 </style>
 
 <canvas id="stage" aria-hidden="true"></canvas>

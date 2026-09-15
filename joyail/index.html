@@ -212,6 +212,13 @@
   .btn:hover{background:transparent;color:var(--live)}
   footer{border-top:1px solid var(--line-soft);padding:30px 0;color:var(--dim);font-size:12px;text-align:center}
   footer .mark-sm{color:var(--muted)}
+  /* Decorative films: never show the browser's play button. When autoplay is
+     blocked (iOS Low Power Mode, Android Data Saver) fall back to the poster
+     still image silently, instead of overlaying a manual play control. */
+  video.filmv{pointer-events:none}
+  video.filmv::-webkit-media-controls{display:none!important}
+  video.filmv::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
+  video.filmv::-webkit-media-controls-panel{display:none!important}
 </style>
 </head>
 <body id="top">
