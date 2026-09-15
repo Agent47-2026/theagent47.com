@@ -187,6 +187,22 @@
   .arrow .line::after{content:"\25B8";position:absolute;right:-2px;top:-9px;color:var(--live)}
   @media(max-width:760px){.arrow{flex-basis:100%;flex-direction:row;padding:14px}.arrow .line{width:60px}}
 
+  /* ── contact form (same as the main site) ── */
+  .signup{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  .signup input[type=email]{font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.02em;
+    padding:13px 16px;min-width:300px;border-radius:3px;border:1px solid var(--line-visible);
+    background:var(--surface);color:var(--ink);transition:border-color .22s}
+  .signup input[type=email]::placeholder{color:var(--dim)}
+  .signup input[type=email]:focus{outline:none;border-color:var(--live)}
+  .signup .btn{border-color:var(--live);color:var(--live);background:transparent}
+  .signup .btn:hover,.signup .btn:focus-visible{background:var(--live);color:var(--void)}
+  .signup-note{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:16px}
+  .form-msg{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;margin-top:18px;min-height:18px}
+  .form-msg.ok{color:var(--success)}
+  .form-msg.err{color:var(--live)}
+  .hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}
+  @media(max-width:560px){.signup input[type=email]{min-width:0;width:100%}.signup .btn{width:100%}}
+
   /* ── cta ── */
   .cta{text-align:center;padding:70px 0}
   .cta h2{margin-bottom:16px}
@@ -432,8 +448,19 @@
   </div>
   <div class="wrap">
     <h2>Want to try it on one site?</h2>
-    <p class="sec-intro" style="margin:0 auto 26px">We can set up a single site for a week so you can see the reports and hear the calls yourself, before you decide anything.</p>
-    <a class="btn" href="mailto:admin@exotichutllc.com?subject=Joyail%20Security%20—%20welfare%20check%20trial">Set up a trial</a>
+    <p class="sec-intro" style="margin:0 auto 26px">We can set up a single site for a week so you can see the reports and hear the calls yourself, before you decide anything. Leave your email and we'll be in touch.</p>
+    <form class="signup" id="signup" novalidate>
+      <input type="hidden" name="_subject" value="Joyail Security - welfare check enquiry">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_source" value="/joyail">
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
+      <label for="signup-email" class="hp">Your email address</label>
+      <input id="signup-email" type="email" name="email" placeholder="you@joyailsecurity.com" required autocomplete="email">
+      <button class="btn" type="submit">Set up a trial</button>
+    </form>
+    <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+    <p class="signup-note">No spam. We'll only contact you about this.</p>
   </div>
 </section>
 
@@ -464,6 +491,29 @@
       else { left=true; }
     }); }, {threshold:0.35}).observe(section);
     setTimeout(show, 4000);               // never leave a section blank if autoplay is refused
+  });
+})();
+</script>
+<script>
+(function(){
+  var f=document.getElementById('signup'), m=document.getElementById('form-msg');
+  if(!f) return;
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var email=f.email.value.trim(), btn=f.querySelector('button');
+    m.className='form-msg';
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
+      m.textContent='Please enter a valid email address.'; m.classList.add('err'); return;
+    }
+    btn.disabled=true; var label=btn.textContent; btn.textContent='Sending...';
+    fetch('https://formsubmit.co/ajax/admin@exotichutllc.com',{
+      method:'POST', headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify(Object.fromEntries(new FormData(f)))
+    }).then(function(r){return r.json()}).then(function(d){
+      if(d.success===true||d.success==='true'){ f.reset(); m.textContent="Thanks - we'll be in touch shortly."; m.classList.add('ok'); }
+      else { m.textContent='Something went wrong. Please try again.'; m.classList.add('err'); }
+    }).catch(function(){ m.textContent='Network error. Please try again.'; m.classList.add('err'); })
+     .finally(function(){ btn.disabled=false; btn.textContent=label; });
   });
 })();
 </script>
