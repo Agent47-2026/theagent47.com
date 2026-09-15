@@ -219,16 +219,6 @@
   video.filmv::-webkit-media-controls{display:none!important}
   video.filmv::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
   video.filmv::-webkit-media-controls-panel{display:none!important}
-  /* Touch devices (phones/tablets): no <video> at all — mobile browsers
-     block autoplay (Low Power Mode / Data Saver) and paint a play button on
-     any paused video, which no pseudo-element reliably hides on modern iOS.
-     So drop the video element and show the poster still image instead. A PC
-     with a mouse keeps the video (this query only matches touch pointers). */
-  @media (hover: none) and (pointer: coarse){
-    .herofilm video, .secfilm video{display:none!important}
-    .herofilm{background:#000 url(/hero-poster.jpg) center/cover no-repeat}
-    .secfilm{display:none}          /* decorative section films: skip on touch */
-  }
 </style>
 </head>
 <body id="top">
@@ -243,7 +233,7 @@
 
 <header class="hero">
   <div class="herofilm" aria-hidden="true">
-    <video class="filmv" autoplay loop muted playsinline preload="auto" poster="/hero-poster.jpg">
+    <video class="filmv" autoplay loop muted playsinline webkit-playsinline preload="auto" poster="/hero-poster.jpg">
       <source src="/hero.mp4" type="video/mp4">
     </video>
   </div>
@@ -258,7 +248,7 @@
 <!-- ── How it works ── -->
 <section>
   <div class="secfilm" aria-hidden="true">
-    <video class="filmv" muted playsinline preload="none" poster="/data-poster.jpg">
+    <video class="filmv" autoplay loop muted playsinline webkit-playsinline preload="auto" poster="/data-poster.jpg">
       <source src="/data.mp4" type="video/mp4">
     </video>
   </div>
@@ -349,7 +339,7 @@
 <!-- ── If they don't answer ── -->
 <section>
   <div class="secfilm" aria-hidden="true">
-    <video class="filmv" muted playsinline preload="none" poster="/problem-poster.jpg">
+    <video class="filmv" autoplay loop muted playsinline webkit-playsinline preload="auto" poster="/problem-poster.jpg">
       <source src="/problem.mp4" type="video/mp4">
     </video>
   </div>
@@ -459,7 +449,7 @@
 <!-- ── CTA ── -->
 <section class="cta" id="start">
   <div class="secfilm" aria-hidden="true">
-    <video class="filmv" muted playsinline preload="none" poster="/who-poster.jpg">
+    <video class="filmv" autoplay loop muted playsinline webkit-playsinline preload="auto" poster="/who-poster.jpg">
       <source src="/who.mp4" type="video/mp4">
     </video>
   </div>
@@ -489,26 +479,16 @@
 
 <script>
 (function(){
-  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var START = 0.1;
-  if(reduce) return;                       // CSS already shows a still frame
-  document.querySelectorAll('video.filmv').forEach(function(v){
-    var host = v.closest('.herofilm, .secfilm');
-    var section = v.closest('header.hero, section');
-    if(!host || !section) return;
-    var shown=false, left=false, primed=false;
-    function show(){ if(!shown){ shown=true; v.style.opacity=host.classList.contains('secfilm')?'.9':'.9'; } }
-    function toStart(){ if(Math.abs(v.currentTime-START)>0.02){ try{v.currentTime=START;}catch(e){} } }
-    function play(){ var pr=v.play(); if(pr&&pr.catch) pr.catch(show); }
-    function run(){ if(v.readyState<1){ v.addEventListener('loadedmetadata',function(){toStart();play();},{once:true}); v.load(); } else { toStart(); play(); } }
-    v.addEventListener('seeked', show, {once:true});
-    v.addEventListener('timeupdate', function(){ if(v.currentTime>=START) show(); });
-    new IntersectionObserver(function(es){ es.forEach(function(e){
-      if(e.isIntersecting){ if(!primed){primed=true;run();} else if(left){left=false;run();} }
-      else { left=true; }
-    }); }, {threshold:0.35}).observe(section);
-    setTimeout(show, 4000);               // never leave a section blank if autoplay is refused
+  // Background films: declarative autoplay handles most browsers. This makes
+  // sure they stay muted and playing, and force-plays them on the first touch
+  // (a user gesture unlocks playback on mobile even when autoplay was refused).
+  var vids = [].slice.call(document.querySelectorAll('video.filmv'));
+  function playAll(){ vids.forEach(function(v){ v.muted = true; var p = v.play(); if(p&&p.catch) p.catch(function(){}); }); }
+  playAll();
+  ['touchstart','click','scroll'].forEach(function(ev){
+    window.addEventListener(ev, function once(){ playAll(); window.removeEventListener(ev, once); }, {passive:true, once:true});
   });
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) playAll(); });
 })();
 </script>
 <script>
