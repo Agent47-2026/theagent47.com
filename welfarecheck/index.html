@@ -174,7 +174,7 @@
   .field .k{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
   .field .v{font-size:15px;color:var(--ink)}
 
-  /* ── sync (GuardHouse) ── */
+  /* ── sync (daily sheet) ── */
   .sync{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;justify-content:center}
   .node{flex:1 1 240px;max-width:320px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px 24px}
   .node.accent{border-color:var(--live-dim)}
@@ -219,6 +219,14 @@
   video.filmv::-webkit-media-controls{display:none!important}
   video.filmv::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
   video.filmv::-webkit-media-controls-panel{display:none!important}
+  /* voice sample player */
+  .sample{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:22px}
+  .playbtn{display:inline-flex;align-items:center;gap:9px;font-family:"Space Mono",monospace;
+    font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--live);background:transparent;
+    border:1px solid var(--live);border-radius:3px;padding:11px 18px;cursor:pointer;transition:.2s}
+  .playbtn:hover,.playbtn.playing{background:var(--live);color:#000}
+  .playbtn .ico{font-size:12px;line-height:1}
+  .sample-cap{font-size:13px;color:var(--muted);max-width:36ch;line-height:1.5}
 </style>
 </head>
 <body id="top">
@@ -255,12 +263,12 @@
   <div class="wrap">
     <p class="sec-label">How it works</p>
     <h2>Every hour, each guard gets a quick call.</h2>
-    <p class="sec-intro">The same simple check, all night. It takes each guard about ten seconds.</p>
+    <p class="sec-intro">The same simple check every hour, 11 pm to 7 am. It takes each guard about ten seconds.</p>
     <div class="steps">
       <div class="step">
         <div class="n">1</div>
         <h3>The phone rings</h3>
-        <p>At the top of every hour, the guard's phone rings — a normal call, from your number.</p>
+        <p>From <b>11:30 pm</b>, then every hour through to <b>7 am</b>, the guard's phone rings — a normal call, from your number.</p>
       </div>
       <div class="step">
         <div class="n">2</div>
@@ -285,11 +293,16 @@
         <h2>A warm, professional voice — never a robot.</h2>
         <p>Every check-in comes from a friendly receptionist who greets the guard and asks if everything's okay. Calm, clear and human — it never sounds like an automated line.</p>
         <p class="small">The same familiar voice, every hour, all night. All calls are in English.</p>
+        <div class="sample">
+          <button class="playbtn" id="voiceBtn" type="button" aria-pressed="false"><span class="ico" aria-hidden="true">▶</span><span class="lbl">Hear Friday</span></button>
+          <span class="sample-cap">"Hi Joyail, this is Friday — your overnight welfare check staff."</span>
+          <audio id="voiceSample" src="friday-sample.mp3" preload="none"></audio>
+        </div>
       </div>
       <div class="fig">
         <div class="phone">
           <div class="notch"></div>
-          <div class="msg-head">Incoming call · 1:00 am</div>
+          <div class="msg-head">Incoming call · 1:30 am</div>
           <div class="callrow">
             <div class="ic" aria-hidden="true">📞</div>
             <div class="t"><b>Joyail Security</b><span>mobile</span></div>
@@ -343,7 +356,7 @@
     <div class="showcase">
       <div class="phone">
         <div class="notch"></div>
-        <div class="msg-head">Text message · 2:00 am</div>
+        <div class="msg-head">Text message · 2:30 am</div>
         <div class="bubble">
           <div class="from">Agent 47</div>
           <b>⚠ No answer — welfare check</b><br><br>
@@ -380,13 +393,13 @@
         <table>
           <thead><tr><th>Time</th><th>Site</th><th>Guard</th><th>Answered on</th><th>Result</th></tr></thead>
           <tbody>
-            <tr><td>11:00 pm</td><td>Docklands</td><td>Ravi</td><td>1st call</td><td><span class="pill ok">All good</span></td></tr>
-            <tr><td>12:00 am</td><td>Docklands</td><td>Ravi</td><td>1st call</td><td><span class="pill ok">All good</span></td></tr>
-            <tr><td>12:00 am</td><td>Southbank</td><td>Amrit</td><td>1st call</td><td><span class="pill ok">All good</span></td></tr>
-            <tr><td>1:00 am</td><td>Southbank</td><td>Amrit</td><td>3rd call</td><td><span class="pill slow">Slow to answer</span></td></tr>
-            <tr><td>1:00 am</td><td>Docklands</td><td>Ravi</td><td>1st call</td><td><span class="pill ok">All good</span></td></tr>
-            <tr><td>2:00 am</td><td>Southbank</td><td>Amrit</td><td>—</td><td><span class="pill esc">No answer · escalated</span></td></tr>
-            <tr><td>2:00 am</td><td>Docklands</td><td>Ravi</td><td>2nd call</td><td><span class="pill slow">Slow to answer</span></td></tr>
+            <tr><td>11:30 pm</td><td>Docklands</td><td>Ravi</td><td>1st call</td><td><span class="pill ok">All good</span></td></tr>
+            <tr><td>12:30 am</td><td>Docklands</td><td>Ravi</td><td>1st call</td><td><span class="pill ok">All good</span></td></tr>
+            <tr><td>12:30 am</td><td>Southbank</td><td>Amrit</td><td>1st call</td><td><span class="pill ok">All good</span></td></tr>
+            <tr><td>1:30 am</td><td>Southbank</td><td>Amrit</td><td>3rd call</td><td><span class="pill slow">Slow to answer</span></td></tr>
+            <tr><td>1:30 am</td><td>Docklands</td><td>Ravi</td><td>1st call</td><td><span class="pill ok">All good</span></td></tr>
+            <tr><td>2:30 am</td><td>Southbank</td><td>Amrit</td><td>—</td><td><span class="pill esc">No answer · escalated</span></td></tr>
+            <tr><td>2:30 am</td><td>Docklands</td><td>Ravi</td><td>2nd call</td><td><span class="pill slow">Slow to answer</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -394,24 +407,24 @@
   </div>
 </section>
 
-<!-- ── Connects to GuardHouse ── -->
+<!-- ── Your daily sheet ── -->
 <section>
   <div class="wrap">
-    <p class="sec-label">Nothing to set up</p>
-    <h2>It reads tonight's roster from GuardHouse.</h2>
-    <p class="sec-intro">You already track who's on shift in GuardHouse. With your okay, we connect to it — so the system always knows which guards are on tonight, their numbers and sites, and calls the right people. No lists to keep, nothing to enter by hand.</p>
+    <p class="sec-label">Nothing to integrate</p>
+    <h2>You send tonight's list. We do the rest.</h2>
+    <p class="sec-intro">Each evening, Joyail sends us one simple spreadsheet — the guards on tonight, their phone numbers, and their sites. That's all we need. Nothing to install, no system to connect to.</p>
     <div class="sync">
       <div class="node">
-        <div class="node-t">GuardHouse</div>
-        <div class="node-s">Your roster — who's on, where, and when</div>
+        <div class="node-t">Your daily sheet</div>
+        <div class="node-s">Excel — tonight's guards, numbers and sites</div>
       </div>
-      <div class="arrow" aria-hidden="true"><span>pulls automatically</span><div class="line"></div></div>
+      <div class="arrow" aria-hidden="true"><span>you send each day</span><div class="line"></div></div>
       <div class="node accent">
         <div class="node-t">Agent 47</div>
         <div class="node-s">Calls the right guards, at the right sites, all night</div>
       </div>
     </div>
-    <p class="small" style="text-align:center;color:var(--dim);margin-top:22px">Each guard's name, number and site come straight from your roster — nothing to enter by hand, and it stays current on its own.</p>
+    <p class="small" style="text-align:center;color:var(--dim);margin-top:22px">Every name, number and site comes straight from the sheet you send that day — so it's always exactly tonight's roster, nothing to keep in sync.</p>
   </div>
 </section>
 
@@ -481,6 +494,18 @@
     }).catch(function(){ m.textContent='Network error. Please try again.'; m.classList.add('err'); })
      .finally(function(){ btn.disabled=false; btn.textContent=label; });
   });
+})();
+</script>
+<script>
+(function(){
+  var b=document.getElementById('voiceBtn'), a=document.getElementById('voiceSample');
+  if(!b||!a) return;
+  var ico=b.querySelector('.ico'), lbl=b.querySelector('.lbl');
+  function set(p){ b.classList.toggle('playing',p); b.setAttribute('aria-pressed',p?'true':'false');
+    ico.textContent=p?'⏸':'▶'; lbl.textContent=p?'Playing…':'Hear Friday'; }
+  b.addEventListener('click',function(){ if(a.paused){ var pr=a.play(); if(pr&&pr.catch)pr.catch(function(){}); set(true);} else { a.pause(); } });
+  a.addEventListener('pause',function(){ set(false); });
+  a.addEventListener('ended',function(){ try{a.currentTime=0;}catch(e){} set(false); });
 })();
 </script>
 </body>
