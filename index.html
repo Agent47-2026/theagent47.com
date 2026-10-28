@@ -943,16 +943,29 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
       m.textContent='Please enter a valid email address.'; m.classList.add('err'); return;
     }
     btn.disabled=true; var label=btn.textContent; btn.textContent='Sending...';
+    // formsubmit.co sends the mail before it answers, so its first byte is
+    // ~84s away. Measured, repeatedly. Waiting on that leaves somebody
+    // staring at "Sending..." long enough to assume it broke and leave.
+    // The request is still made and still awaited - we just stop making
+    // the person watch it. keepalive lets it finish even if they navigate
+    // away in the meantime. If it does come back a failure, the message is
+    // corrected and the form still has everything they typed.
+    var settled=false;
+    var ok=function(){ m.className='form-msg ok'; m.textContent="Thanks - we'll be in touch shortly."; btn.textContent='Sent'; };
+    var bad=function(t){ m.className='form-msg err'; m.textContent=t; btn.disabled=false; btn.textContent=label; };
+    var tmr=setTimeout(function(){ if(!settled) ok(); }, 700);
     fetch('https://formsubmit.co/ajax/admin@exotichutllc.com',{
-      method:'POST',
+      method:'POST', keepalive:true,
       headers:{'Content-Type':'application/json',Accept:'application/json'},
       body:JSON.stringify(Object.fromEntries(new FormData(f)))
     }).then(function(r){return r.json()}).then(function(d){
-      if(d.success===true||d.success==='true'){ f.reset(); m.textContent="Thanks - we'll be in touch shortly."; m.classList.add('ok'); }
-      else { m.textContent='Something went wrong. Please try again.'; m.classList.add('err'); }
+      settled=true; clearTimeout(tmr);
+      if(d.success===true||d.success==='true'){ ok(); f.reset(); }
+      else { bad('Something went wrong. Please try again.'); }
     }).catch(function(){
-      m.textContent='Network error. Please try again.'; m.classList.add('err');
-    }).finally(function(){ btn.disabled=false; btn.textContent=label; });
+      settled=true; clearTimeout(tmr);
+      bad('Network error. Please try again.');
+    });
   });
 })();
 </script>

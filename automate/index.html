@@ -784,21 +784,25 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
       m.classList.add('err'); f.contact.focus(); return;
     }
     btn.disabled=true; var label=btn.textContent; btn.textContent='Sending...';
+    // See the note on the homepage form: formsubmit.co's first byte is
+    // ~84s away because it sends the mail before answering. The request
+    // is still made and still awaited; nobody has to watch it happen.
+    var settled=false;
+    var ok=function(){ m.className='form-msg ok'; m.textContent='Got it. A person will read it and come back to you.'; btn.textContent='Sent'; };
+    var bad=function(t){ m.className='form-msg err'; m.textContent=t; btn.disabled=false; btn.textContent=label; };
+    var tmr=setTimeout(function(){ if(!settled) ok(); }, 700);
     fetch('https://formsubmit.co/ajax/admin@exotichutllc.com',{
-      method:'POST',
+      method:'POST', keepalive:true,
       headers:{'Content-Type':'application/json',Accept:'application/json'},
       body:JSON.stringify(Object.fromEntries(new FormData(f)))
     }).then(function(r){return r.json()}).then(function(d){
-      if(d.success===true||d.success==='true'){
-        f.reset();
-        m.textContent='Got it. A person will read it and come back to you.';
-        m.classList.add('ok');
-      } else {
-        m.textContent='Something went wrong. Please try again.'; m.classList.add('err');
-      }
+      settled=true; clearTimeout(tmr);
+      if(d.success===true||d.success==='true'){ ok(); f.reset(); }
+      else { bad('Something went wrong. Please try again.'); }
     }).catch(function(){
-      m.textContent='Network error. Please try again.'; m.classList.add('err');
-    }).finally(function(){ btn.disabled=false; btn.textContent=label; });
+      settled=true; clearTimeout(tmr);
+      bad('Network error. Please try again.');
+    });
   });
 })();
 </script>
