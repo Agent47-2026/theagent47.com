@@ -567,6 +567,24 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 .sitenav a:hover,.sitenav a:focus-visible{color:var(--live)}
 .sitenav .here{color:var(--ink)}
 
+
+/* ── demo: trade picker + three questions ───────────────────────────
+   The flat list of examples was generic - a dentist does not see
+   themselves in "I'm on a job". Pick the trade first and the examples
+   become theirs. Then three small questions instead of one blank box:
+   easier to answer, and the enquiry that arrives is worth something. */
+.trades{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 0}
+.tr{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);background:transparent;
+  border:1px solid var(--line-visible);border-radius:2px;padding:10px 15px;
+  cursor:pointer;transition:all .18s}
+.tr:hover{color:var(--ink);border-color:var(--ink-2)}
+.tr[aria-pressed="true"]{color:#120A04;background:var(--live);border-color:var(--live);
+  font-weight:700}
+.qs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.qs .full{grid-column:1 / -1}
+@media(max-width:700px){ .qs{grid-template-columns:1fr} }
+
 /* ── the ask page ────────────────────────────────────────────────────
    One job: get somebody to describe a problem in their own words.
    Everything here serves that - the examples exist because nobody can
@@ -647,27 +665,34 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
       person &mdash; there is no wrong way to write it. Even if you reckon it can&rsquo;t be
       done, send it anyway.</p>
 
-    <p class="exlabel">Not sure where to start? Tap one</p>
-    <div class="examples">
-      <button type="button" class="ex" data-ex="I miss calls when I'm on a job">I miss calls when I'm on a job</button>
-      <button type="button" class="ex" data-ex="Nobody follows up the quotes">Nobody follows up the quotes</button>
-      <button type="button" class="ex" data-ex="I do the roster on Sunday night">I do the roster on Sunday night</button>
-      <button type="button" class="ex" data-ex="Clients no-show and I find out when they don't turn up">Clients no-show and I find out when they don't turn up</button>
-      <button type="button" class="ex" data-ex="Invoices go out late">Invoices go out late</button>
-      <button type="button" class="ex" data-ex="I type the same order into three places">I type the same order into three places</button>
-      <button type="button" class="ex" data-ex="Nobody checks my night staff got home">Nobody checks my night staff got home</button>
-      <button type="button" class="ex" data-ex="We never ask anyone for a review">We never ask anyone for a review</button>
-    </div>
+    <p class="exlabel">First &mdash; what sort of business?</p>
+    <div class="trades" id="trades"></div>
+
+    <p class="exlabel" id="exlabel" hidden>Sound familiar? Tap one</p>
+    <div class="examples" id="examples"></div>
 
     <form class="askform" id="ask" novalidate>
       <input type="hidden" name="_subject" value="Agent 47 - automate this">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="trade" id="tradefield" value="">
       <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
 
-      <label class="fl" for="problem">What should it do?</label>
-      <textarea id="problem" name="problem" required
-        placeholder="Describe it however it comes out. The messier the better &mdash; we would rather read the real thing than a tidy summary."></textarea>
+      <div class="qs">
+        <div class="full">
+          <label class="fl" for="problem">What is the job?</label>
+          <textarea id="problem" name="problem" required
+            placeholder="Describe it however it comes out. The messier the better &mdash; we would rather read the real thing than a tidy summary."></textarea>
+        </div>
+        <div>
+          <label class="fl" for="often">How often does it happen?</label>
+          <input id="often" type="text" name="often" placeholder="Every day, every Sunday, ten times a week&hellip;">
+        </div>
+        <div>
+          <label class="fl" for="who">Who does it now?</label>
+          <input id="who" type="text" name="who" placeholder="Me, my wife, nobody&hellip;">
+        </div>
+      </div>
 
       <div class="fields">
         <div>
@@ -703,16 +728,41 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 
 <script>
 (function(){
+  var DATA = {"Clinic": ["Patients no-show and we find out when they don't arrive", "Reception is on the phone instead of with the person in front of them", "Nobody sends the reminder the day before", "Recalls never get done"], "Trades": ["I'm up a ladder when the phone goes", "Quotes go out and nobody follows them up", "I write the same job down twice", "Invoices go out late"], "Salon": ["Clients book and then disappear", "The phone rings while I'm mid-colour", "A cancellation just stays empty", "We never ask anyone for a review"], "Security": ["Nobody checks the night crew got home", "The roster eats my Sunday", "Incident reports get written up on Monday", "The client wants a report and I build it by hand"], "Retail": ["Orders get typed into three different places", "Stock runs out before anyone notices", "Supplier emails sit unanswered for days", "Nobody chases the invoice"], "Something else": ["Something only happens when I remember it", "The same job gets done twice by two people", "Customers wait on a reply", "Paperwork piles up until the weekend"]};
+  var row=document.getElementById('trades'), ex=document.getElementById('examples'),
+      lab=document.getElementById('exlabel'), field=document.getElementById('tradefield');
+  Object.keys(DATA).forEach(function(name){
+    var b=document.createElement('button');
+    b.type='button'; b.className='tr'; b.textContent=name; b.setAttribute('aria-pressed','false');
+    b.addEventListener('click', function(){
+      row.querySelectorAll('.tr').forEach(function(o){o.setAttribute('aria-pressed','false')});
+      b.setAttribute('aria-pressed','true');
+      field.value=name;
+      lab.hidden=false;
+      ex.innerHTML='';
+      DATA[name].forEach(function(t){
+        var c=document.createElement('button');
+        c.type='button'; c.className='ex'; c.textContent=t; c.dataset.ex=t;
+        ex.appendChild(c);
+      });
+    });
+    row.appendChild(b);
+  });
+})();
+</script>
+<script>
+(function(){
   // Tapping an example seeds the box rather than replacing what is there,
   // so somebody who has already started typing does not lose it.
   var box=document.getElementById('problem');
-  document.querySelectorAll('.ex').forEach(function(b){
-    b.addEventListener('click', function(){
+  document.getElementById('examples').addEventListener('click', function(e){
+    var b=e.target.closest('.ex'); if(!b) return;
+    {
       var t=b.dataset.ex;
       box.value = box.value.trim() ? box.value.replace(/\s*$/,'') + '\n' + t : t;
       box.focus();
       box.setSelectionRange(box.value.length, box.value.length);
-    });
+    }
   });
 })();
 </script>
