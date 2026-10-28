@@ -407,13 +407,13 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 }
 #orb{
   width:min(560px,86vw); height:min(560px,86vw);
-  margin-left:40%;                 /* pushed right, text sits clear of it */
-  opacity:.88;
+  margin-left:38%;                 /* pushed right, text sits clear of it */
+  opacity:.98;
 }
 .orbwrap::after{                    /* fade it into the page, no hard edge */
   content:""; position:absolute; inset:0;
   background:
-    linear-gradient(to right,#000 0%,#000 44%,rgba(0,0,0,.86) 58%,rgba(0,0,0,.28) 78%,rgba(0,0,0,0) 100%),
+    linear-gradient(to right,#000 0%,#000 40%,rgba(0,0,0,.72) 54%,rgba(0,0,0,.12) 74%,rgba(0,0,0,0) 100%),
     linear-gradient(to bottom,#000 0%,rgba(0,0,0,0) 16%,rgba(0,0,0,0) 74%,#000 100%);
 }
 
@@ -465,14 +465,26 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   .ours{grid-template-columns:repeat(2,1fr)}
   section{padding:66px 0}
   .wrap{padding:0 20px}
-  #orb{margin-left:30%;width:min(380px,66vw);height:min(380px,66vw);opacity:.5}
+  #orb{margin-left:60%;margin-top:30%;width:min(430px,78vw);height:min(430px,78vw);opacity:.95}
   .orbwrap::after{
     background:
-      linear-gradient(to right,#000 0%,rgba(0,0,0,.92) 52%,rgba(0,0,0,.45) 76%,rgba(0,0,0,.1) 100%),
-      linear-gradient(to bottom,#000 0%,rgba(0,0,0,.2) 12%,rgba(0,0,0,.2) 70%,#000 92%);
+      linear-gradient(to right,#000 0%,rgba(0,0,0,.72) 34%,rgba(0,0,0,.12) 62%,rgba(0,0,0,0) 100%),
+      linear-gradient(to bottom,#000 0%,rgba(0,0,0,.45) 10%,rgba(0,0,0,0) 44%,rgba(0,0,0,0) 76%,#000 97%);
   }
   .step{grid-template-columns:40px 1fr}
   .step .ms{display:none}
+}
+/* On a phone the text runs the full width, so there is no side column to
+   put the orb in. Moving it will not help and dimming it washes it out,
+   so it comes out of the centred grid and sits in the bottom corner,
+   bright, below everything that has to be read. */
+@media(max-width:560px){
+  #orb{position:absolute;right:-70px;bottom:-16px;width:280px;height:280px;
+       margin:0;opacity:.95}
+  .orbwrap::after{
+    background:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.55) 8%,
+      rgba(0,0,0,.25) 40%,rgba(0,0,0,0) 72%,rgba(0,0,0,.65) 100%);
+  }
 }
 @media(max-width:480px){
   .ours{grid-template-columns:1fr}
