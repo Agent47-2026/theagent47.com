@@ -149,7 +149,7 @@ nav .inner{
 :focus-visible{outline:2px solid var(--live);outline-offset:3px}
 
 /* ── hero ── */
-header.hero{padding:150px 0 90px;position:relative;overflow:hidden}
+header.hero{padding:132px 0 96px;position:relative;overflow:hidden}
 
 .hero-grid{display:block;position:relative;z-index:2}
 /* Cap the text itself, not the wrap — otherwise .wrap's auto margins centre
@@ -161,7 +161,7 @@ h1{
   font-size:clamp(34px,5.6vw,64px);line-height:1.08;margin:22px 0 24px;font-weight:900;
   text-wrap:balance;
 }
-h1 .accent{color:var(--ink)}
+h1 .accent{color:var(--live)}
 .hl{
   background:linear-gradient(
     to bottom,
@@ -185,6 +185,35 @@ canvas.blockfx{position:absolute;pointer-events:none;z-index:3}
 @media(prefers-reduced-motion:reduce){ .fx h1#headline, .fx section h2{opacity:1} }
 .sub{font-size:16px;color:var(--ink-2);max-width:47ch;margin-bottom:32px}
 .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+/* The page is black with hairline outlines on everything, so a filled
+   shape is the only object on it that is not a stroke. That, plus a slow
+   ring, is what carries the eye here. */
+.cta-row .btn{
+  background:var(--live);border-color:var(--live);color:#120A04;font-weight:700;
+  padding:16px 32px;font-size:13.5px;
+  box-shadow:0 0 0 0 rgba(229,105,15,.55);
+  animation:ctaPulse 1.5s ease-out infinite;
+  transition:background .2s,color .2s,transform .12s}
+.cta-row .btn::after{content:"\2192";font-weight:700;display:inline-block;
+  margin-left:10px;transition:transform .18s}
+.cta-row .btn:hover{background:#FF7A1A;border-color:#FF7A1A;color:#120A04}
+.cta-row .btn:hover::after{transform:translateX(4px)}
+.cta-row .btn:active{transform:translateY(1px)}
+@keyframes ctaPulse{
+  0%{box-shadow:0 0 0 0 rgba(229,105,15,.5), 0 0 22px rgba(229,105,15,.35)}
+  70%{box-shadow:0 0 0 16px rgba(229,105,15,0), 0 0 30px rgba(229,105,15,.45)}
+  100%{box-shadow:0 0 0 0 rgba(229,105,15,0), 0 0 22px rgba(229,105,15,.35)}}
+/* Anyone running "reduce motion" gets the glow without the pulse. */
+@media(prefers-reduced-motion:reduce){
+  .cta-row .btn{animation:none;box-shadow:0 0 24px rgba(229,105,15,.4)}}
+.ctanote{margin-top:13px;font-family:"Space Mono",monospace;font-size:11.5px;
+  letter-spacing:.08em;color:var(--muted)}
+/* One long label instead of two short ones: the old flex row squeezed it
+   to 118px on a phone and broke it over four lines. */
+@media(max-width:560px){
+  .cta-row{display:block}
+  .cta-row .btn{display:block;width:100%;text-align:center;padding:16px 18px}
+}
 
 /* ── hero film ── */
 /* Background, not a card: no frame, anchored to the right edge and scaled
@@ -316,6 +345,10 @@ section > .wrap{position:relative;z-index:2}
   letter-spacing:.16em;margin-bottom:14px}
 .cap h3{font-size:18px}
 .cap p{font-size:14.5px;margin:0}
+.cap .capmore{display:block;margin-top:12px;font-family:"Space Mono",monospace;
+  font-size:12px;letter-spacing:.08em;color:var(--muted);text-decoration:none;
+  border-bottom:1px solid var(--line-visible);padding-bottom:2px;width:fit-content}
+.cap .capmore:hover{color:var(--live);border-color:var(--live)}
 
 /* ── split ── */
 .split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
@@ -374,13 +407,13 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 }
 #orb{
   width:min(560px,86vw); height:min(560px,86vw);
-  margin-left:34%;                 /* pushed right, text sits clear of it */
-  opacity:.95;
+  margin-left:40%;                 /* pushed right, text sits clear of it */
+  opacity:.88;
 }
 .orbwrap::after{                    /* fade it into the page, no hard edge */
   content:""; position:absolute; inset:0;
   background:
-    linear-gradient(to right,#000 0%,#000 30%,rgba(0,0,0,.72) 46%,rgba(0,0,0,.15) 72%,rgba(0,0,0,0) 100%),
+    linear-gradient(to right,#000 0%,#000 44%,rgba(0,0,0,.86) 58%,rgba(0,0,0,.28) 78%,rgba(0,0,0,0) 100%),
     linear-gradient(to bottom,#000 0%,rgba(0,0,0,0) 16%,rgba(0,0,0,0) 74%,#000 100%);
 }
 
@@ -432,10 +465,11 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   .ours{grid-template-columns:repeat(2,1fr)}
   section{padding:66px 0}
   .wrap{padding:0 20px}
-  #orb{margin-left:0;width:min(420px,78vw);height:min(420px,78vw);opacity:.75}
+  #orb{margin-left:30%;width:min(380px,66vw);height:min(380px,66vw);opacity:.5}
   .orbwrap::after{
-    background:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.25) 14%,
-      rgba(0,0,0,.55) 48%,rgba(0,0,0,.92) 70%,#000 86%);
+    background:
+      linear-gradient(to right,#000 0%,rgba(0,0,0,.92) 52%,rgba(0,0,0,.45) 76%,rgba(0,0,0,.1) 100%),
+      linear-gradient(to bottom,#000 0%,rgba(0,0,0,.2) 12%,rgba(0,0,0,.2) 70%,#000 92%);
   }
   .step{grid-template-columns:40px 1fr}
   .step .ms{display:none}
@@ -471,6 +505,13 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   .fridaybox .who{padding:28px 22px}
   .fcaps{padding:24px 22px}
 }
+/* ── site nav: every page can reach every other page ── */
+.sitenav{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:center;align-items:center;
+  padding:28px 20px;border-top:1px solid var(--line);
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.sitenav a{color:var(--muted);text-decoration:none;transition:color .2s}
+.sitenav a:hover,.sitenav a:focus-visible{color:var(--live)}
+.sitenav .here{color:var(--ink)}
 </style>
 <a class="skip" href="#main">Skip to content</a>
 
@@ -478,10 +519,9 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   <div class="inner">
     <a class="brand" href="#top"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg></span>AGENT 47</a>
     <div class="navlinks">
-      <a href="#running">Running now</a>
-      <a href="#friday">Friday</a>
-      <a href="#build">What we build</a>
-      <a href="#how">How</a>
+      <a href="#build">What we do</a>
+      <a href="#running">Already running</a>
+      <a href="#how">How it starts</a>
       <a href="#contact">Talk to us</a>
     </div>
   </div>
@@ -494,15 +534,15 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   <div class="orbwrap"><canvas id="orb" width="680" height="680"></canvas></div>
   <div class="wrap hero-grid">
     <div class="h1wrap">
-      <p class="label dim mono">Agent 47 &nbsp;·&nbsp; AI agents, built and run</p>
-      <h1>We automate businesses.<br><span class="accent">We started with our own.</span></h1>
-      <p class="sub">Phones answered, orders taken, checks made, reports written — with
-        nobody on shift. We build the agents, apps and software a business runs on,
-        then we run them.</p>
+      <h1>The jobs nobody has time for,<br><span class="accent">done while you sleep.</span></h1>
+      <p class="sub">Clinics, trades, salons, security, retail — every one of them has jobs
+        nobody has time for. We build something that does them: picks up the phone, books the
+        appointment, sends the reminder the day before. You tell us the job in your business,
+        we build it, and we keep it running.</p>
       <div class="cta-row">
-        <a class="btn" href="#contact">Talk to us</a>
-        <a class="btn ghost" href="#running">See what's running</a>
+        <a class="btn" href="#contact">Got a problem? We'll Automate it</a>
       </div>
+      <p class="ctanote">Takes a minute. A person reads it, not a robot.</p>
     </div>
   </div>
 </header>
@@ -543,26 +583,26 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 <!-- ── Friday: the agent that runs the other agents ─────────────────── -->
 <section id="friday">
   <div class="wrap reveal">
-    <div class="eyebrow-row"><span class="label mono">The one that runs the rest</span></div>
-    <h2>Friday runs the company by voice.</h2>
-    <p class="lede">Every agent above was built, deployed and is watched by another
-      agent. We talk to her the way you would talk to a manager who never goes home.</p>
+    <div class="eyebrow-row"><span class="label mono">How we know it works</span></div>
+    <h2>We run our own business this way.</h2>
+    <p class="lede">Friday is ours. We talk to her the way you would talk to a manager who
+      never goes home — and she does the work, not just the talking.</p>
 
     <div class="fridaybox">
       <div class="who">
         <div class="nm">FRIDAY</div>
         <div class="role">Voice · operations · full access</div>
-        <p>Friday holds the keys to the whole stack. She starts and stops the other
-          agents, checks whether last night's calls actually went out, opens a browser
-          when she needs an answer, writes the report, and tells us out loud what she
-          found. The sphere at the top of this page is her.</p>
-        <p class="note">Friday is not for sale yet — she is how we run Agent 47, and
-          the proof that one agent can hold a whole business together.</p>
+        <p>Ask her whether last night's calls went out and she checks, then tells you.
+          Ask her to write the invoice and it is written. She looks things up, starts and
+          stops the rest of the system, and says what she found out loud. The sphere at the
+          top of this page is her.</p>
+        <p class="note">Friday is not for sale yet. She is how we run Agent 47 — and the
+          reason we know this works before we sell it to you.</p>
       </div>
       <div class="fcaps">
         <div class="fcap"><div class="k">Talks</div><div class="v">A real conversation in her own voice. No menus, no wake word, no phrasing to learn.</div></div>
-        <div class="fcap"><div class="k">Operates</div><div class="v">Starts, stops, deploys and watches every other agent on the platform.</div></div>
-        <div class="fcap"><div class="k">Browses</div><div class="v">Opens a browser, searches, reads the page, finds the flight — and leaves the screen up while she explains what she found.</div></div>
+        <div class="fcap"><div class="k">Runs it</div><div class="v">Starts, stops and keeps an eye on everything else we have built.</div></div>
+        <div class="fcap"><div class="k">Looks it up</div><div class="v">Opens a browser, searches, reads the page, finds the flight — and leaves it on screen while she explains it.</div></div>
         <div class="fcap"><div class="k">Writes</div><div class="v">Drafts the email, builds the invoice, files the morning report.</div></div>
         <div class="fcap"><div class="k">Remembers</div><div class="v">Knows the business, the numbers and what happened last week, without being told again.</div></div>
         <div class="fcap"><div class="k">Stops</div><div class="v">Say stop and everything stops — the thinking, the voice, the browser. Mid&#8209;sentence.</div></div>
@@ -571,50 +611,51 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   </div>
 </section>
 
-<!-- ── the range, as categories rather than "anything" ─────────────── -->
+<!-- ── the range, described as jobs rather than technology ────────── -->
 <section id="build">
   <div class="wrap reveal">
-    <div class="eyebrow-row"><span class="label mono">What we build</span></div>
-    <h2>If a person is doing it to a script, an agent can do it.</h2>
-    <p class="lede">Four kinds of work. Most businesses need two of them before they
-      need the fourth.</p>
+    <div class="eyebrow-row"><span class="label mono">What we do</span></div>
+    <h2>If one of your people does it the same way every time, we can take it off them.</h2>
+    <p class="lede">Most businesses have two or three of these. You do not have to pick them
+      all, and you should not start with more than one.</p>
 
     <div class="caps">
       <div class="cap">
-        <div class="ico">[ VOICE ]</div>
-        <h3>Voice agents</h3>
-        <p>Phones answered, orders taken, appointments booked, follow-ups called.
-          On your own number, in a voice you pick.</p>
+        <div class="ico">[ PHONE ]</div>
+        <h3>Answering the phone</h3>
+        <p>Every call picked up, at any hour. It knows your prices, your hours and what you
+          sell. It books the job or takes the order, and texts you what was said.</p>
       </div>
       <div class="cap">
-        <div class="ico">[ TOOLS ]</div>
-        <h3>Internal tools</h3>
-        <p>The spreadsheet nobody wants to own. Stock, suppliers, rosters, reporting —
-          turned into something that runs itself.</p>
+        <div class="ico">[ CHECK ]</div>
+        <h3>Checking on your people</h3>
+        <p>Rings everyone on shift to make sure they are okay. If someone does not pick up,
+          it tries again, then rings you.</p>
       </div>
       <div class="cap">
-        <div class="ico">[ WEB ]</div>
-        <h3>Apps and websites</h3>
-        <p>Customer portals, booking pages, dashboards, the site itself. Built to
-          plug into the agents, not sit beside them.</p>
+        <div class="ico">[ ADMIN ]</div>
+        <h3>The paperwork nobody gets to</h3>
+        <p>Stock, suppliers, rosters, invoices, the weekly report. The jobs that live in a
+          spreadsheet and quietly stop being done.</p>
       </div>
       <div class="cap">
-        <div class="ico">[ AUTO ]</div>
-        <h3>End to end</h3>
-        <p>The whole loop: the call comes in, the job is booked, the work is tracked,
-          the invoice goes out, the report lands. No one in the middle.</p>
+        <div class="ico">[ ONLINE ]</div>
+        <h3>Your website and booking page</h3>
+        <p>The page customers actually use to order or book — built so it talks to everything
+          above, instead of being one more thing to check.</p>
       </div>
       <div class="cap">
         <div class="ico">[ WATCH ]</div>
-        <h3>Monitoring</h3>
-        <p>Every agent is watched by another one. If something stops, it is noticed
-          and fixed — usually before you would have seen it.</p>
+        <h3>Making sure it keeps working</h3>
+        <p>Something is always watching the rest. If it stops at 2am, it is fixed before you
+          wake up, and you get told what happened.
+          <a class="capmore" href="/watchman/">How that works &rarr;</a></p>
       </div>
       <div class="cap">
         <div class="ico">[ RUN ]</div>
-        <h3>We keep running it</h3>
-        <p>We do not hand over a repo and leave. It stays deployed, monitored and
-          maintained by us.</p>
+        <h3>We keep it running</h3>
+        <p>We do not hand you a system and walk away. It stays ours to look after. If it
+          breaks, that is our problem, not yours.</p>
       </div>
     </div>
   </div>
@@ -624,62 +665,55 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 <section id="how">
   <div class="wrap reveal">
     <div class="eyebrow-row"><span class="label mono">How</span></div>
-    <h2>One platform. Every agent built on top of it.</h2>
-    <p class="lede">The hard parts are built once — the voice, the phone lines, the
-      deployment, the monitoring. A new agent is only the part that is actually
-      different. That is why the second product took a week and not three months.</p>
+    <h2>You start with one job, and only one.</h2>
+    <p class="lede">We have already built the hard parts — the phone lines, the voice, the
+      bits that keep it running. So your first job takes a week, not three months, and you
+      find out quickly whether it was worth doing.</p>
 
     <div class="flow">
       <div class="step">
         <div class="k">01</div>
-        <div><h3>We work out what is repetitive</h3>
-          <p>Usually it is the phone, or something living in a spreadsheet. One
-            conversation is normally enough to find it.</p></div>
+        <div><h3>You tell us what keeps going wrong</h3>
+          <p>Usually it is the phone, or something stuck in a spreadsheet. One conversation
+            is normally enough to spot it.</p></div>
         <div class="ms">day 1</div>
       </div>
       <div class="step">
         <div class="k">02</div>
-        <div><h3>We build the narrow version first</h3>
-          <p>The smallest thing that takes real work off you, running in your
-            business, not a demo.</p></div>
+        <div><h3>We build the smallest useful version</h3>
+          <p>Not a demo — the real thing, working in your business, doing one job
+            properly.</p></div>
         <div class="ms">week 1</div>
       </div>
       <div class="step">
         <div class="k">03</div>
-        <div><h3>You judge it on a number we agree first</h3>
-          <p>Calls answered, hours saved, jobs booked. If it misses, we have not
-            earned the next step.</p></div>
+        <div><h3>You judge it on a number we agree up front</h3>
+          <p>Calls answered, hours saved, orders taken. If it misses, we have not earned
+            the next step.</p></div>
         <div class="ms">week 4</div>
       </div>
       <div class="step">
         <div class="k">04</div>
-        <div><h3>Then it grows</h3>
-          <p>Each new piece is cheaper than the last, because the platform underneath
-            is already there.</p></div>
+        <div><h3>Then you add the next one</h3>
+          <p>Each one after the first costs less, because the groundwork is already
+            done.</p></div>
         <div class="ms">ongoing</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── the credibility section ─────────────────────────────────────── -->
+<!-- ── credibility, without making anyone learn six names ─────────── -->
 <section id="ours">
   <div class="wrap reveal">
-    <div class="eyebrow-row"><span class="label mono">We run on it</span></div>
-    <h2>Our own business is the first customer.</h2>
-    <p class="lede">Friday is not the only one. Every agent below is running right now,
-      inside our own business — which is how we find the problems before you do.</p>
-
-    <div class="ours">
-      <div><div class="n">Scribe</div><div class="d">Learns how you actually write, then drafts in your voice. Finds machine-written text and fixes it.</div><div class="st">Running</div></div>
-      <div><div class="n">MiaLexAI</div><div class="d">Legal assistant. Reads the contract, the policy, the lease — and answers questions about it.</div><div class="st">Running</div></div>
-      <div><div class="n">Amazon Seller</div><div class="d">Watches listings, stock and supplier messages, and chases what needs chasing.</div><div class="st">Running</div></div>
-      <div><div class="n">ReminderAI</div><div class="d">Watches an inbox and pushes only the things that actually need you to your phone.</div><div class="st">Running</div></div>
-      <div><div class="n">LocalGuideAI</div><div class="d">Marketplace console and concierge — profiles, enquiries and bookings in one place.</div><div class="st">Running</div></div>
-      <div><div class="n">The Hub</div><div class="d">One front door to every agent on the platform, with each one's status on it.</div><div class="st">Running</div></div>
-    </div>
-    <p class="after">Each one runs on its own, isolated from the rest. One stopping
-      cannot take another down — which is the whole reason they are built this way.</p>
+    <div class="eyebrow-row"><span class="label mono">We use it too</span></div>
+    <h2>Everything we sell, we run ourselves first.</h2>
+    <p class="lede">Right now seven of these are working away inside our own business —
+      writing in our voice, reading contracts, watching stock and suppliers, sorting the
+      inbox, and keeping an eye on each other. We find the problems before you do, because
+      we are the ones living with them.</p>
+    <p class="after">Nothing here is a demo we built for a website. If it is not good
+      enough for us to rely on, we do not sell it.</p>
   </div>
 </section>
 
@@ -688,7 +722,7 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   <div class="wrap reveal">
     <div class="eyebrow-row"><span class="label mono">Talk to us</span></div>
     <h2>Something in your business nobody has time for?</h2>
-    <p class="lede">That is usually where an agent earns its keep. Tell us what it is —
+    <p class="lede">That is usually the job worth handing over first. Tell us what it is —
       if it is not worth building, we will say so.</p>
 
     <form class="signup" id="signup" novalidate>
@@ -708,9 +742,16 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 
 </main>
 
+<div class="sitenav" role="navigation" aria-label="Agent 47 pages">
+  <span class="here">Agent 47</span>
+  <a href="/aireceptionist/">AI Receptionist</a>
+  <a href="/welfarecheck/">WelfareCheck</a>
+  <a href="/watchman/">Watchman</a>
+</div>
+
 <footer>
   <div class="wrap">
-    AGENT 47 &middot; AI agents, built and run &middot; theagent47.com
+    AGENT 47 &middot; We build it, we run it &middot; theagent47.com
   </div>
 </footer>
 
