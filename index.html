@@ -486,10 +486,18 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
      every word below it sits on clean ground. 104px is what fits on a
      375px phone with the button and the line under it still above the
      fold: at 375x667 everything lands by 657px. */
-  header.hero{padding:148px 0 52px}
+  /* The orb is sized from the screen's height, not fixed, so it takes
+     whatever room the screen has spare. A 375x667 phone has about ten
+     pixels to give and gets 104px; a 430x932 has plenty and gets 263.
+     The hero is min-height:100svh so section 1 is exactly one screen
+     with nothing of the next section showing under it. svh, not vh, so
+     the mobile browser's address bar does not push the button off. */
+  :root{--orbm:clamp(104px, 60vh - 296px, 300px)}
+  header.hero{min-height:100svh;box-sizing:border-box;
+              padding:calc(var(--orbm) + 44px) 0 52px}
   #orb{position:absolute;left:50%;transform:translateX(-50%);
-       top:58px;right:auto;bottom:auto;
-       width:104px;height:104px;margin:0;opacity:1}
+       top:34px;right:auto;bottom:auto;
+       width:var(--orbm);height:var(--orbm);margin:0;opacity:1}
   .orbwrap::after{
     background:linear-gradient(to bottom,rgba(0,0,0,.35) 0%,rgba(0,0,0,0) 14%,
       rgba(0,0,0,0) 86%,#000 100%);
