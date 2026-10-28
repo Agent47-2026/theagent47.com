@@ -408,6 +408,11 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 .ours > div{background:var(--surface);padding:22px 20px}
 .ours .n{font-family:Doto,monospace;font-weight:700;font-size:15px;color:var(--ink)}
 .ours .d{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+.ours .st{display:flex;align-items:center;gap:7px;margin-top:14px;
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--live)}
+.ours .st::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--live);box-shadow:0 0 6px var(--live)}
 
 .ours .after{margin:20px 0 0;font-size:14px;color:var(--muted);max-width:60ch}
 
@@ -662,19 +667,19 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   <div class="wrap reveal">
     <div class="eyebrow-row"><span class="label mono">We run on it</span></div>
     <h2>Our own business is the first customer.</h2>
-    <p class="lede">Friday is not the only one. Everything below runs inside our own
-      business first — which is how we find the problems before you do.</p>
+    <p class="lede">Friday is not the only one. Every agent below is running right now,
+      inside our own business — which is how we find the problems before you do.</p>
 
     <div class="ours">
-      <div><div class="n">Scribe</div><div class="d">Learns how you actually write, then drafts in your voice. Finds machine-written text and fixes it.</div></div>
-      <div><div class="n">MiaLexAI</div><div class="d">Legal assistant. Reads the contract, the policy, the lease — and answers questions about it.</div></div>
-      <div><div class="n">Amazon Seller</div><div class="d">Watches listings, stock and supplier messages, and chases what needs chasing.</div></div>
-      <div><div class="n">ReminderAI</div><div class="d">Watches an inbox and pushes only the things that actually need you to your phone.</div></div>
-      <div><div class="n">LocalGuideAI</div><div class="d">Marketplace console and concierge — profiles, enquiries and bookings in one place.</div></div>
-      <div><div class="n">Watchman</div><div class="d">Watches WelfareCheck overnight and raises the alarm if the system itself stops.</div></div>
+      <div><div class="n">Scribe</div><div class="d">Learns how you actually write, then drafts in your voice. Finds machine-written text and fixes it.</div><div class="st">Running</div></div>
+      <div><div class="n">MiaLexAI</div><div class="d">Legal assistant. Reads the contract, the policy, the lease — and answers questions about it.</div><div class="st">Running</div></div>
+      <div><div class="n">Amazon Seller</div><div class="d">Watches listings, stock and supplier messages, and chases what needs chasing.</div><div class="st">Running</div></div>
+      <div><div class="n">ReminderAI</div><div class="d">Watches an inbox and pushes only the things that actually need you to your phone.</div><div class="st">Running</div></div>
+      <div><div class="n">LocalGuideAI</div><div class="d">Marketplace console and concierge — profiles, enquiries and bookings in one place.</div><div class="st">Running</div></div>
+      <div><div class="n">The Hub</div><div class="d">One front door to every agent on the platform, with each one's status on it.</div><div class="st">Running</div></div>
     </div>
-    <p class="after">Each one runs on its own, isolated from the rest, behind a single
-      front door. One stopping cannot take another down.</p>
+    <p class="after">Each one runs on its own, isolated from the rest. One stopping
+      cannot take another down — which is the whole reason they are built this way.</p>
   </div>
 </section>
 
