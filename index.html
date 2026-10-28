@@ -1,15 +1,798 @@
-<!doctype html>
-<html lang="en">
-<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Redirecting…</title>
-<meta http-equiv="refresh" content="0; url=/aireceptionist/">
-<link rel="canonical" href="/aireceptionist/">
-<link rel="icon" href="/favicon.ico">
-<script>location.replace("/aireceptionist/" + location.search + location.hash);</script>
-</head>
-<body style="font-family:system-ui,sans-serif;background:#0a0e14;color:#eaeef5;display:grid;place-items:center;height:100vh;margin:0">
-<p>Redirecting to <a href="/aireceptionist/" style="color:#8ab4ff">the AI Receptionist</a>…</p>
-</body>
-</html>
+<meta name="description" content="Agent 47 builds the agents, apps and software a business runs on. Voice agents, internal tools, websites — built once, run for you.">
+<meta property="og:title" content="Agent 47">
+<meta property="og:description" content="We automate businesses. We started with our own.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://theagent47.com/">
+<meta property="og:image" content="https://theagent47.com/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<title>Agent 47</title>
+<!-- Favicon. Google Search renders the site icon from a PNG of at least 48px
+     (multiples of 48 preferred) and also probes /favicon.ico; browser tabs use
+     16/32; iOS uses apple-touch-icon; the manifest covers Android/PWA. -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16"  href="/icons/favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32"  href="/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48"  href="/icons/icon-48.png">
+<link rel="icon" type="image/png" sizes="96x96"  href="/icons/icon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#5b8cf5">
+<!-- The receptionist page adds .fx here, which parks every section h2 at
+     opacity:0 until a 150-line typewriter script fades it back in. A QR
+     landing page has to paint instantly and must still read correctly if
+     JS never runs, so .fx is deliberately NOT added; the lighter .reveal
+     fade already in this stylesheet does the motion instead. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@400;600;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+
+<style>
+:root{
+  /* Palette lifted from the reference site's own tokens. */
+  --void:#000000;
+  --ground:#000000;
+  --surface:#111111;
+  --surface-2:#1A1A1A;
+  --line:#222222;
+  --line-soft:#1a1a1a;
+  --line-visible:#333333;
+  --ink:#FFFFFF;
+  --ink-2:#E8E8E8;
+  --muted:#999999;
+  --dim:#666666;
+  --live:#E5690F;
+  --live-dim:#7a3708;
+  --accent-subtle:rgba(229,105,15,.15);
+  --success:#4A9E5C;
+  --warm:#5B9BF6;
+  --maxw:1160px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);
+  background-color:var(--ground);
+  background-image:radial-gradient(circle at 8px 7px, rgba(255,255,255,.055) 0 1px, transparent 1.5px);
+  background-size:26px 26px;
+  background-attachment:fixed;
+  font-family:"Space Mono",ui-monospace,monospace;
+  font-size:15px;line-height:1.72;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;position:relative;z-index:2}
+#stage{
+  position:fixed;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;display:block;
+}
+.vignette{
+  position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at center, #0000 40%, #000000a6);
+}
+nav,header.hero,section,footer{position:relative;z-index:2}
+
+/* ── shared type ── */
+.mono{font-family:"Space Mono",ui-monospace,monospace}
+.label{
+  font-family:"Space Mono",ui-monospace,monospace;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:500;
+}
+.label.dim{color:var(--muted)}
+h1,h2,h3{font-family:Doto,"Space Mono",monospace;font-weight:700;letter-spacing:.02em}
+h2{font-size:clamp(28px,4.1vw,46px);line-height:1.14;margin:0 0 18px;text-wrap:balance}
+h3{font-size:22px;margin:0 0 8px;line-height:1.25}
+p{margin:0 0 18px;color:var(--ink-2);max-width:64ch}
+em{font-style:normal;color:var(--ink)}
+a{color:inherit}
+
+/* ── nav ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  backdrop-filter:blur(8px);background:rgba(0,0,0,.78);
+  border-bottom:1px solid var(--line-soft);
+}
+nav .inner{
+  max-width:var(--maxw);margin:0 auto;padding:15px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.brand{display:flex;align-items:center;gap:11px;font-family:"Space Mono",monospace;
+  font-size:13px;letter-spacing:.2em;font-weight:700;text-decoration:none;color:var(--ink)}
+.brand .mark{width:26px;height:26px;border-radius:7px;flex:none;
+  background:linear-gradient(135deg,#00c8ff,#a855f7);
+  display:grid;place-items:center;padding:4.5px;box-sizing:border-box;
+  box-shadow:0 0 10px rgba(0,200,255,.28);animation:markGlow 3s ease-in-out infinite}
+.brand .mark svg{width:100%;height:100%;color:#fff;filter:drop-shadow(0 0 1.5px rgba(255,255,255,.55))}
+@keyframes markGlow{0%,100%{box-shadow:0 0 10px rgba(0,200,255,.28)}50%{box-shadow:0 0 16px rgba(120,150,255,.45)}}
+@media(prefers-reduced-motion:reduce){.brand .mark{animation:none}}
+@keyframes ping{
+  0%{box-shadow:0 0 0 0 rgba(229,105,15,.55)}
+  70%{box-shadow:0 0 0 9px rgba(229,105,15,0)}
+  100%{box-shadow:0 0 0 0 rgba(229,105,15,0)}
+}
+.navlinks{display:flex;gap:26px;align-items:center}
+.navlinks a{font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.navlinks a:hover,.navlinks a:focus-visible{color:var(--ink)}
+@media(max-width:800px){.navlinks{display:none}}
+
+.btn{
+  display:inline-block;font-family:"Space Mono",monospace;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;text-decoration:none;
+  padding:12px 22px;border:1px solid var(--ink-2);color:var(--ink);
+  background:transparent;cursor:pointer;transition:all .22s;border-radius:2px;
+}
+.btn:hover,.btn:focus-visible{background:var(--ink);color:var(--void)}
+.btn.ghost{border-color:var(--line-visible);color:var(--muted)}
+.btn.ghost:hover,.btn.ghost:focus-visible{border-color:var(--ink-2);background:transparent;color:var(--ink)}
+
+  /* -- signup form -- */
+  .signup{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  .signup input[type=email]{
+    font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.02em;
+    padding:12px 16px;min-width:300px;border-radius:2px;
+    border:1px solid var(--line-visible);background:var(--surface);color:var(--ink);
+    transition:border-color .22s;
+  }
+  .signup input[type=email]::placeholder{color:var(--dim)}
+  .signup input[type=email]:focus{outline:none;border-color:var(--live)}
+  .signup .btn{border-color:var(--live);color:var(--live)}
+  .signup .btn:hover,.signup .btn:focus-visible{background:var(--live);color:var(--void)}
+  .signup-note{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:16px}
+  .form-msg{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;margin-top:18px;min-height:18px}
+  .form-msg.ok{color:var(--success)}
+  .form-msg.err{color:var(--live)}
+  .hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}
+  @media(max-width:560px){.signup input[type=email]{min-width:0;width:100%}.signup .btn{width:100%}}
+:focus-visible{outline:2px solid var(--live);outline-offset:3px}
+
+/* ── hero ── */
+header.hero{padding:150px 0 90px;position:relative;overflow:hidden}
+
+.hero-grid{display:block;position:relative;z-index:2}
+/* Cap the text itself, not the wrap — otherwise .wrap's auto margins centre
+   the whole column and the hero stops aligning with the sections below.
+   The copy sits in a single child div, so the cap goes there. */
+.hero-grid > div{max-width:560px}
+@media(max-width:960px){.hero-grid > div{max-width:none}}
+h1{
+  font-size:clamp(34px,5.6vw,64px);line-height:1.08;margin:22px 0 24px;font-weight:900;
+  text-wrap:balance;
+}
+h1 .accent{color:var(--ink)}
+.hl{
+  background:linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 54%,
+    var(--live) 54%,
+    var(--live) 92%,
+    transparent 92%
+  );
+  color:var(--ink);
+  padding:0 .14em;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+}
+.h1wrap{position:relative}
+canvas.blockfx{position:absolute;pointer-events:none;z-index:3}
+/* Headings start hidden ONLY when scripting is on, so the blocks are the
+   first thing you ever see. Without JS the .fx class is never added and
+   every heading renders normally. */
+.fx h1#headline, .fx section h2{opacity:0}
+@media(prefers-reduced-motion:reduce){ .fx h1#headline, .fx section h2{opacity:1} }
+.sub{font-size:16px;color:var(--ink-2);max-width:47ch;margin-bottom:32px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+
+/* ── hero film ── */
+/* Background, not a card: no frame, anchored to the right edge and scaled
+   past the viewport so the machine reads large. The left is masked to black
+   so the headline always sits on clean ground. */
+.herofilm{
+  /* Full width so there is no visible seam where the film ends; the
+     gradient below does the fading instead of a hard edge. */
+  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.herofilm video{
+  /* Sized explicitly and anchored right — 30% smaller than the previous
+     cover-fill. The clip is almost entirely black, so its edges blend into
+     the page rather than showing as a hard boundary. */
+  position:absolute;top:50%;left:72%;
+  width:74%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  transition:opacity .25s linear;
+}
+.herofilm::after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(to right, #000 0%, #000 34%, rgba(0,0,0,.78) 46%, rgba(0,0,0,.22) 66%, rgba(0,0,0,0) 100%),
+    linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 76%, #000 100%);
+}
+@media(max-width:900px){
+  .herofilm video{
+    inset:0;top:0;left:0;
+    width:100%;height:100%;min-width:0;
+    transform:none;
+    object-fit:contain;
+    object-position:center 30%;
+  }
+  .herofilm::after{
+    background:linear-gradient(to bottom,
+      #000 0%, rgba(0,0,0,.22) 16%, rgba(0,0,0,.5) 46%, rgba(0,0,0,.9) 64%, #000 80%);
+  }
+}
+@media(prefers-reduced-motion:reduce){ .herofilm video{opacity:.9} }
+
+/* ── sections ── */
+section{padding:100px 0;border-top:none;position:relative}
+section::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right, rgba(232,232,232,.18), transparent);
+}
+.eyebrow-row{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.eyebrow-row::after{content:"";height:1px;flex:1;background:var(--line)}
+.lede{font-size:18px;color:var(--ink);max-width:62ch;line-height:1.6}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ── stat strip ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);
+  border:1px solid var(--line-soft);margin-top:44px}
+@media(max-width:760px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--surface);padding:30px 26px}
+.stat .n{font-family:Doto,monospace;font-weight:900;font-size:42px;color:var(--ink);line-height:1}
+.stat .t{font-size:14px;color:var(--muted);margin-top:9px}
+
+/* ── section films ── */
+/* Same treatment as the hero: background, no frame, faded out toward the
+   text so the copy always sits on clean black. */
+.secfilm{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.secfilm video{
+  position:absolute;top:50%;left:70%;
+  width:62%;min-width:520px;
+  transform:translate(-50%,-50%);
+  opacity:0;transition:opacity .5s linear;
+}
+.secfilm::after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(to right, #000 0%, #000 32%, rgba(0,0,0,.72) 48%, rgba(0,0,0,.3) 70%, rgba(0,0,0,.6) 100%),
+    linear-gradient(to bottom, #000 0%, rgba(0,0,0,.1) 18%, rgba(0,0,0,.1) 78%, #000 100%);
+}
+section > .wrap{position:relative;z-index:2}
+@media(max-width:900px){
+  .secfilm video{
+    inset:0;top:0;left:0;
+    width:100%;height:100%;min-width:0;min-height:0;
+    transform:none;
+    object-fit:contain;
+    object-position:center 26%;
+  }
+  /* Stacked layout: fade top and bottom instead of left-to-right, so the
+     copy sits on solid black wherever it lands. */
+  .secfilm::after{
+    background:linear-gradient(to bottom,
+      #000 0%, rgba(0,0,0,.25) 14%, rgba(0,0,0,.45) 44%, rgba(0,0,0,.88) 62%, #000 78%);
+  }
+}
+@media(prefers-reduced-motion:reduce){ .secfilm video{opacity:.9} }
+
+/* ── figures ── */
+/* Diagram plays itself: nodes fade in, connectors draw. Only applied once JS
+   has armed it, so without scripting the figure renders complete. */
+/* Nothing here hides the diagram: the initial hidden state is set by JS, so
+   a page without scripting renders it complete and there is no cascade to
+   fight. Connectors are hidden by dash-offset, nodes by inline opacity. */
+#flowfig .fx-node{transition:opacity .45s ease}
+
+.fig{margin:34px 0 0;padding:0}
+.fig svg{width:100%;max-width:880px;height:auto;display:block;color:var(--ink-2)}
+.fig figcaption{
+  margin-top:16px;font-size:13px;color:var(--muted);max-width:60ch;line-height:1.6;
+}
+/* ── flow ── */
+.flow{display:grid;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);margin-top:40px}
+.step{background:var(--surface);padding:26px 28px;display:grid;grid-template-columns:56px 1fr auto;
+  gap:22px;align-items:start}
+@media(max-width:700px){.step{grid-template-columns:44px 1fr;gap:16px}.step .ms{display:none}}
+.step .k{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);padding-top:4px;letter-spacing:.1em}
+.step h3{font-size:19px;margin-bottom:5px}
+.step p{margin:0;font-size:15px}
+.step .ms{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);
+  white-space:nowrap;padding-top:6px;letter-spacing:.08em}
+
+/* ── capability grid ── */
+.caps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);
+  border:1px solid var(--line-soft);margin-top:42px}
+@media(max-width:900px){.caps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.caps{grid-template-columns:1fr}}
+.cap{background:var(--surface);padding:28px 26px;transition:background .25s}
+.cap:hover{background:var(--surface-2)}
+.cap .ico{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);
+  letter-spacing:.16em;margin-bottom:14px}
+.cap h3{font-size:18px}
+.cap p{font-size:14.5px;margin:0}
+
+/* ── split ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+@media(max-width:880px){.split{grid-template-columns:1fr;gap:36px}}
+.card{background:var(--surface-2);border:1px solid var(--line);padding:30px 28px;border-radius:4px}
+.card.hi{border-color:var(--line-visible)}
+.card ul{margin:16px 0 0;padding-left:0;list-style:none}
+.card li{font-size:14.5px;color:var(--ink-2);padding:7px 0 7px 22px;position:relative}
+.card li::before{content:"→";position:absolute;left:0;color:var(--muted);
+  font-family:"Space Mono",monospace;font-size:12px}
+
+/* ── cta ── */
+.cta{text-align:center;padding:110px 0}
+.cta h2{margin-bottom:14px}
+.cta p{margin-left:auto;margin-right:auto}
+footer{border-top:1px solid var(--line-soft);padding:38px 0;
+  font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted);
+  display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;letter-spacing:.08em}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+  /* Decorative films: never show the browser's play button. When autoplay is
+     blocked (iOS Low Power Mode, Android Data Saver) fall back to the poster
+     still image silently, instead of overlaying a manual play control. */
+  video.filmv{pointer-events:none}
+  video.filmv::-webkit-media-controls{display:none!important}
+  video.filmv::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
+  video.filmv::-webkit-media-controls-panel{display:none!important}
+
+/* Skip link: off-screen until keyboard-focused. The receptionist sheet has
+   no .skip rule, so without this it renders as visible body text and shoves
+   the hero down. */
+.skip{position:absolute;left:-9999px;top:0;z-index:100;
+  background:var(--ink);color:var(--void);padding:10px 16px;
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;
+  text-decoration:none;border-radius:2px}
+.skip:focus{left:10px;top:10px}
+
+/* ── Company page additions ────────────────────────────────────────────
+   Everything above this point is the AI Receptionist's own stylesheet,
+   unchanged. These rules add only what that page had no component for:
+   the live orb hero, the product cards, and the mobile-first sizing a
+   QR-code landing needs.
+   ------------------------------------------------------------------ */
+
+/* The hero is a live canvas, not video. 4 KB of JS instead of ~1 MB of
+   mp4 — it renders at the device pixel ratio so it is sharp on any
+   screen, and it paints instantly on a phone on cellular, which is where
+   a business-card QR actually gets scanned. */
+.orbwrap{
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  display:grid; place-items:center; overflow:hidden;
+}
+#orb{
+  width:min(560px,86vw); height:min(560px,86vw);
+  margin-left:34%;                 /* pushed right, text sits clear of it */
+  opacity:.95;
+}
+.orbwrap::after{                    /* fade it into the page, no hard edge */
+  content:""; position:absolute; inset:0;
+  background:
+    linear-gradient(to right,#000 0%,#000 30%,rgba(0,0,0,.72) 46%,rgba(0,0,0,.15) 72%,rgba(0,0,0,0) 100%),
+    linear-gradient(to bottom,#000 0%,rgba(0,0,0,0) 16%,rgba(0,0,0,0) 74%,#000 100%);
+}
+
+/* ── product cards ── */
+.prods{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+  background:var(--line-soft);border:1px solid var(--line-soft);margin-top:36px}
+.prod{background:var(--surface);padding:30px 28px;display:flex;flex-direction:column;
+  transition:background .25s}
+.prod:hover{background:var(--surface-2)}
+.prod .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.prod .tag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);border:1px solid var(--line-visible);
+  padding:3px 8px;border-radius:2px}
+.prod .live{color:var(--live);border-color:var(--live-dim)}
+.prod h3{font-size:20px;margin:0 0 8px}
+.prod p{margin:0 0 18px;font-size:15px;flex:1}
+.prod a.more{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;
+  color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-visible);
+  padding-bottom:2px;align-self:flex-start}
+.prod a.more:hover{color:var(--live);border-color:var(--live)}
+
+/* ── "we run on it" ── */
+.ours{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line-soft);border:1px solid var(--line-soft);margin-top:34px}
+.ours > div{background:var(--surface);padding:22px 20px}
+.ours .n{font-family:Doto,monospace;font-weight:700;font-size:15px;color:var(--ink)}
+.ours .d{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+
+.ours .after{margin:20px 0 0;font-size:14px;color:var(--muted);max-width:60ch}
+
+/* ── contact ── */
+.contact{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:30px}
+.contact .mail{font-family:"Space Mono",monospace;font-size:15px;color:var(--ink-2);
+  text-decoration:none;border-bottom:1px solid var(--line-visible);padding-bottom:3px}
+.contact .mail:hover{color:var(--live);border-color:var(--live)}
+
+/* ── mobile first: this page is mostly read on a phone, from a QR ──
+   The receptionist page was designed desktop-down. A card scan is the
+   opposite, so these are not an afterthought — they are the main case. */
+@media(max-width:860px){
+  .prods,.caps,.stats{grid-template-columns:1fr}
+  .ours{grid-template-columns:repeat(2,1fr)}
+  section{padding:66px 0}
+  .wrap{padding:0 20px}
+  #orb{margin-left:0;width:min(420px,78vw);height:min(420px,78vw);opacity:.75}
+  .orbwrap::after{
+    background:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.25) 14%,
+      rgba(0,0,0,.55) 48%,rgba(0,0,0,.92) 70%,#000 86%);
+  }
+  .step{grid-template-columns:40px 1fr}
+  .step .ms{display:none}
+}
+@media(max-width:480px){
+  .ours{grid-template-columns:1fr}
+  .cta-row{width:100%}
+  .cta-row .btn{flex:1;text-align:center}
+}
+@media(prefers-reduced-motion:reduce){ #orb{opacity:.6} }
+
+/* ── Friday ─────────────────────────────────────────────────────────────
+   She is the reason the rest of the stack exists, so she gets a block of
+   her own rather than one tile in the roster below. */
+.fridaybox{display:grid;grid-template-columns:1.05fr 1fr;gap:1px;margin-top:36px;
+  background:var(--line-soft);border:1px solid var(--line-soft)}
+.fridaybox .who{background:var(--surface-2);padding:34px 30px}
+.fridaybox .who .nm{font-family:Doto,monospace;font-weight:900;font-size:36px;
+  color:var(--ink);line-height:1;letter-spacing:.02em}
+.fridaybox .who .role{font-family:"Space Mono",monospace;font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--live);margin-top:13px}
+.fridaybox .who p{margin:17px 0 0;font-size:15px;color:var(--ink-2);line-height:1.62}
+.fridaybox .who .note{margin-top:21px;padding-top:18px;
+  border-top:1px solid var(--line-visible);font-size:13.5px;color:var(--muted)}
+.fcaps{background:var(--surface);padding:28px;display:flex;flex-direction:column;gap:17px}
+.fcap{display:grid;grid-template-columns:82px 1fr;gap:14px;align-items:baseline}
+.fcap .k{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim)}
+.fcap .v{font-size:14.5px;color:var(--ink-2);line-height:1.52}
+@media(max-width:860px){
+  .fridaybox{grid-template-columns:1fr}
+  .fcap{grid-template-columns:1fr;gap:4px}
+  .fridaybox .who{padding:28px 22px}
+  .fcaps{padding:24px 22px}
+}
+</style>
+<a class="skip" href="#main">Skip to content</a>
+
+<nav>
+  <div class="inner">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg></span>AGENT 47</a>
+    <div class="navlinks">
+      <a href="#running">Running now</a>
+      <a href="#friday">Friday</a>
+      <a href="#build">What we build</a>
+      <a href="#how">How</a>
+      <a href="#contact">Talk to us</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ── hero ────────────────────────────────────────────────────────── -->
+<header class="hero">
+  <div class="orbwrap"><canvas id="orb" width="680" height="680"></canvas></div>
+  <div class="wrap hero-grid">
+    <div class="h1wrap">
+      <p class="label dim mono">Agent 47 &nbsp;·&nbsp; AI agents, built and run</p>
+      <h1>We automate businesses.<br><span class="accent">We started with our own.</span></h1>
+      <p class="sub">Phones answered, orders taken, checks made, reports written — with
+        nobody on shift. We build the agents, apps and software a business runs on,
+        then we run them.</p>
+      <div class="cta-row">
+        <a class="btn" href="#contact">Talk to us</a>
+        <a class="btn ghost" href="#running">See what's running</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── proof first, claims later ───────────────────────────────────── -->
+<section id="running">
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label mono">Running now</span></div>
+    <h2>Two products answering real calls, tonight.</h2>
+    <p class="lede">Not prototypes. Both are live, on real phone numbers, with real
+      customers on the other end.</p>
+
+    <div class="prods">
+      <div class="prod">
+        <div class="top"><span class="tag live">● Live</span><span class="tag">Voice</span></div>
+        <h3>AI Receptionist</h3>
+        <p>Answers every call and text, knows the business, books the job, takes the
+          order, and passes on the ones that need a person. Nothing goes to voicemail.</p>
+        <a class="more" href="/aireceptionist/">See the receptionist →</a>
+      </div>
+      <div class="prod">
+        <div class="top"><span class="tag live">● Live</span><span class="tag">Voice</span></div>
+        <h3>WelfareCheck</h3>
+        <p>Rings everyone on a night roster, hour by hour, and asks if they are okay.
+          No answer and it escalates to their supervisor, then reports in the morning.</p>
+        <a class="more" href="/welfarecheck/">See WelfareCheck →</a>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n">2</div><div class="t">products in production</div></div>
+      <div class="stat"><div class="n">Sept</div><div class="t">live since September 2026</div></div>
+      <div class="stat"><div class="n">7</div><div class="t">days to build the second one</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Friday: the agent that runs the other agents ─────────────────── -->
+<section id="friday">
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label mono">The one that runs the rest</span></div>
+    <h2>Friday runs the company by voice.</h2>
+    <p class="lede">Every agent above was built, deployed and is watched by another
+      agent. We talk to her the way you would talk to a manager who never goes home.</p>
+
+    <div class="fridaybox">
+      <div class="who">
+        <div class="nm">FRIDAY</div>
+        <div class="role">Voice · operations · full access</div>
+        <p>Friday holds the keys to the whole stack. She starts and stops the other
+          agents, checks whether last night's calls actually went out, opens a browser
+          when she needs an answer, writes the report, and tells us out loud what she
+          found. The sphere at the top of this page is her.</p>
+        <p class="note">Friday is not for sale yet — she is how we run Agent 47, and
+          the proof that one agent can hold a whole business together.</p>
+      </div>
+      <div class="fcaps">
+        <div class="fcap"><div class="k">Talks</div><div class="v">A real conversation in her own voice. No menus, no wake word, no phrasing to learn.</div></div>
+        <div class="fcap"><div class="k">Operates</div><div class="v">Starts, stops, deploys and watches every other agent on the platform.</div></div>
+        <div class="fcap"><div class="k">Browses</div><div class="v">Opens a browser, searches, reads the page, finds the flight — and leaves the screen up while she explains what she found.</div></div>
+        <div class="fcap"><div class="k">Writes</div><div class="v">Drafts the email, builds the invoice, files the morning report.</div></div>
+        <div class="fcap"><div class="k">Remembers</div><div class="v">Knows the business, the numbers and what happened last week, without being told again.</div></div>
+        <div class="fcap"><div class="k">Stops</div><div class="v">Say stop and everything stops — the thinking, the voice, the browser. Mid&#8209;sentence.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── the range, as categories rather than "anything" ─────────────── -->
+<section id="build">
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label mono">What we build</span></div>
+    <h2>If a person is doing it to a script, an agent can do it.</h2>
+    <p class="lede">Four kinds of work. Most businesses need two of them before they
+      need the fourth.</p>
+
+    <div class="caps">
+      <div class="cap">
+        <div class="ico">[ VOICE ]</div>
+        <h3>Voice agents</h3>
+        <p>Phones answered, orders taken, appointments booked, follow-ups called.
+          On your own number, in a voice you pick.</p>
+      </div>
+      <div class="cap">
+        <div class="ico">[ TOOLS ]</div>
+        <h3>Internal tools</h3>
+        <p>The spreadsheet nobody wants to own. Stock, suppliers, rosters, reporting —
+          turned into something that runs itself.</p>
+      </div>
+      <div class="cap">
+        <div class="ico">[ WEB ]</div>
+        <h3>Apps and websites</h3>
+        <p>Customer portals, booking pages, dashboards, the site itself. Built to
+          plug into the agents, not sit beside them.</p>
+      </div>
+      <div class="cap">
+        <div class="ico">[ AUTO ]</div>
+        <h3>End to end</h3>
+        <p>The whole loop: the call comes in, the job is booked, the work is tracked,
+          the invoice goes out, the report lands. No one in the middle.</p>
+      </div>
+      <div class="cap">
+        <div class="ico">[ WATCH ]</div>
+        <h3>Monitoring</h3>
+        <p>Every agent is watched by another one. If something stops, it is noticed
+          and fixed — usually before you would have seen it.</p>
+      </div>
+      <div class="cap">
+        <div class="ico">[ RUN ]</div>
+        <h3>We keep running it</h3>
+        <p>We do not hand over a repo and leave. It stays deployed, monitored and
+          maintained by us.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── the section that earns the breadth claim ────────────────────── -->
+<section id="how">
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label mono">How</span></div>
+    <h2>One platform. Every agent built on top of it.</h2>
+    <p class="lede">The hard parts are built once — the voice, the phone lines, the
+      deployment, the monitoring. A new agent is only the part that is actually
+      different. That is why the second product took a week and not three months.</p>
+
+    <div class="flow">
+      <div class="step">
+        <div class="k">01</div>
+        <div><h3>We work out what is repetitive</h3>
+          <p>Usually it is the phone, or something living in a spreadsheet. One
+            conversation is normally enough to find it.</p></div>
+        <div class="ms">day 1</div>
+      </div>
+      <div class="step">
+        <div class="k">02</div>
+        <div><h3>We build the narrow version first</h3>
+          <p>The smallest thing that takes real work off you, running in your
+            business, not a demo.</p></div>
+        <div class="ms">week 1</div>
+      </div>
+      <div class="step">
+        <div class="k">03</div>
+        <div><h3>You judge it on a number we agree first</h3>
+          <p>Calls answered, hours saved, jobs booked. If it misses, we have not
+            earned the next step.</p></div>
+        <div class="ms">week 4</div>
+      </div>
+      <div class="step">
+        <div class="k">04</div>
+        <div><h3>Then it grows</h3>
+          <p>Each new piece is cheaper than the last, because the platform underneath
+            is already there.</p></div>
+        <div class="ms">ongoing</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── the credibility section ─────────────────────────────────────── -->
+<section id="ours">
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label mono">We run on it</span></div>
+    <h2>Our own business is the first customer.</h2>
+    <p class="lede">Friday is not the only one. Everything below runs inside our own
+      business first — which is how we find the problems before you do.</p>
+
+    <div class="ours">
+      <div><div class="n">Scribe</div><div class="d">Learns how you actually write, then drafts in your voice. Finds machine-written text and fixes it.</div></div>
+      <div><div class="n">MiaLexAI</div><div class="d">Legal assistant. Reads the contract, the policy, the lease — and answers questions about it.</div></div>
+      <div><div class="n">Amazon Seller</div><div class="d">Watches listings, stock and supplier messages, and chases what needs chasing.</div></div>
+      <div><div class="n">ReminderAI</div><div class="d">Watches an inbox and pushes only the things that actually need you to your phone.</div></div>
+      <div><div class="n">LocalGuideAI</div><div class="d">Marketplace console and concierge — profiles, enquiries and bookings in one place.</div></div>
+      <div><div class="n">Watchman</div><div class="d">Watches WelfareCheck overnight and raises the alarm if the system itself stops.</div></div>
+    </div>
+    <p class="after">Each one runs on its own, isolated from the rest, behind a single
+      front door. One stopping cannot take another down.</p>
+  </div>
+</section>
+
+<!-- ── one action ──────────────────────────────────────────────────── -->
+<section id="contact">
+  <div class="wrap reveal">
+    <div class="eyebrow-row"><span class="label mono">Talk to us</span></div>
+    <h2>Something in your business nobody has time for?</h2>
+    <p class="lede">That is usually where an agent earns its keep. Tell us what it is —
+      if it is not worth building, we will say so.</p>
+
+    <div class="contact">
+      <a class="btn" href="mailto:admin@exotichutllc.com">Email us</a>
+      <a class="mail" href="mailto:admin@exotichutllc.com">admin@exotichutllc.com</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    AGENT 47 &middot; AI agents, built and run &middot; theagent47.com
+  </div>
+</footer>
+
+<script>
+/* ── Friday's orb, the real renderer ──────────────────────────────────
+   Same five particle groups as FRIDAY's own dashboard: radial spokes,
+   outer shell, great-circle arcs, two orbital rings, and the five
+   logarithmic spiral arms at the core. Canvas is sized from
+   devicePixelRatio so it is pixel-exact rather than an upscaled video,
+   and it pauses when off-screen or hidden so a phone is not cooked. */
+(function(){
+  var cv=document.getElementById('orb'); if(!cv)return;
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  var cssW=cv.getBoundingClientRect().width||420;
+  cv.width=cv.height=Math.round(cssW*Math.max(2,dpr)); /* >=2x: FRIDAY's native 680 look */
+  var ctx=cv.getContext('2d'),W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=W*0.27;
+  var small=window.innerWidth<560;
+  var rand=Math.random;
+  function amber(t){if(t<0.18)return[255,250,220];if(t<0.42)return[255,214,90];
+    if(t<0.66)return[255,157,47];if(t<0.85)return[245,114,13];return[200,74,10];}
+  function dir(){var u=rand()*2-1,th=rand()*Math.PI*2,s=Math.sqrt(1-u*u);
+    return[s*Math.cos(th),u,s*Math.sin(th)];}
+  function build(){
+    var P=[],spokes=small?240:560,shell=small?1100:2600,arcs=small?34:78;
+    for(var i=0;i<spokes;i++){var d=dir(),seg=5+(rand()*9|0),rIn=0.5+rand()*0.15,rOut=0.98+rand()*0.28;
+      for(var j=0;j<seg;j++){var f=j/(seg-1),r=rIn+(rOut-rIn)*f,jt=0.02;
+        P.push({x:d[0]*r+(rand()-0.5)*jt,y:d[1]*r+(rand()-0.5)*jt,z:d[2]*r+(rand()-0.5)*jt,
+          rn:Math.min(1,(r-0.5)/0.76),sz:0.7+rand()*1.3,tw:rand()*6.28,tws:1.5+rand()*3});}}
+    for(var i2=0;i2<shell;i2++){var d2=dir(),r2=0.86+rand()*0.3;
+      P.push({x:d2[0]*r2,y:d2[1]*r2,z:d2[2]*r2,rn:Math.min(1,(r2-0.5)/0.76),
+        sz:0.5+rand()*1.4,tw:rand()*6.28,tws:1.5+rand()*3.5});}
+    for(var k=0;k<arcs;k++){var a=dir(),b0=dir();
+      var dot=a[0]*b0[0]+a[1]*b0[1]+a[2]*b0[2];
+      var b=[b0[0]-dot*a[0],b0[1]-dot*a[1],b0[2]-dot*a[2]];
+      var bl=Math.hypot(b[0],b[1],b[2])||1;b=[b[0]/bl,b[1]/bl,b[2]/bl];
+      var r3=0.72+rand()*0.4,st=rand()*6.28,sweep=0.6+rand()*3.5,n=10+(sweep*10|0);
+      for(var j3=0;j3<n;j3++){var t3=st+sweep*(j3/n),ct3=Math.cos(t3)*r3,st3=Math.sin(t3)*r3;
+        P.push({x:a[0]*ct3+b[0]*st3,y:a[1]*ct3+b[1]*st3,z:a[2]*ct3+b[2]*st3,
+          rn:Math.min(1,(r3-0.5)/0.76),sz:0.5+rand()*1.1,tw:rand()*6.28,tws:2+rand()*3});}}
+    for(var ring=0;ring<2;ring++){var tilt=ring===0?0.5:-0.7,yaw=ring===0?0.3:1.5,rr=1.14;
+      for(var jr=0;jr<260;jr++){var tr=(jr/260)*6.28,px=Math.cos(tr)*rr,py=Math.sin(tr)*rr*0.28,pz=Math.sin(tr)*rr;
+        var y1=py*Math.cos(tilt)-pz*Math.sin(tilt),z1=py*Math.sin(tilt)+pz*Math.cos(tilt);
+        var x2=px*Math.cos(yaw)+z1*Math.sin(yaw),z2=-px*Math.sin(yaw)+z1*Math.cos(yaw);
+        P.push({x:x2,y:y1,z:z2,rn:0.28,sz:1.1+rand()*1.1,tw:rand()*6.28,tws:2,ring:true,ringIdx:ring});}}
+    for(var sp=0;sp<5;sp++){var off=sp*1.257;
+      for(var ts=0;ts<6.5;ts+=0.09){var rs=0.05*Math.exp(0.28*ts);if(rs>0.5)break;
+        P.push({x:Math.cos(ts+off)*rs,y:(rand()-0.5)*0.06,z:Math.sin(ts+off)*rs,
+          rn:0.05+rs,sz:0.9+rand(),tw:rand()*6.28,tws:4,swirl:true});}}
+    return P;}
+  var P=build(),ringPhase=0,ang=0,sw=0,tt=0,D=3.1,tiltX=0.32,running=true;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(reduce)running=false;
+  if(window.IntersectionObserver){
+    new IntersectionObserver(function(e){running=e[0].isIntersecting&&!reduce;}).observe(cv);
+  }
+  document.addEventListener('visibilitychange',function(){running=!document.hidden&&!reduce;});
+  (function draw(){
+    requestAnimationFrame(draw);
+    if(!running&&tt>0)return;
+    tt+=0.016;sw+=0.02;ctx.clearRect(0,0,W,H);
+    ang+=0.001;ringPhase+=0.008;
+    var ca=Math.cos(ang),sa=Math.sin(ang),car=Math.cos(ringPhase),sar=Math.sin(ringPhase),
+        ct=Math.cos(tiltX),stt=Math.sin(tiltX);
+    ctx.globalCompositeOperation='lighter';
+    for(var i=0;i<P.length;i++){var p=P[i];
+      var rx=p.x*ca+p.z*sa,ry_b=p.y,rz=-p.x*sa+p.z*ca;
+      if(p.ring){if(p.ringIdx===0){rx=p.x*car+p.z*sar;rz=-p.x*sar+p.z*car;}
+        else{ry_b=p.y*car-p.z*sar;rz=p.y*sar+p.z*car;rx=p.x;}}
+      else if(p.swirl){var sc=Math.cos(sw),ss=Math.sin(sw);
+        var nx=p.x*sc+p.z*ss,nz=-p.x*ss+p.z*sc;rx=nx*ca+nz*sa;rz=-nx*sa+nz*ca;}
+      var ry=ry_b*ct-rz*stt,rz2=ry_b*stt+rz*ct,f=D/(D-rz2),sx=cx+rx*f*R,sy=cy+ry*f*R;
+      var depth=(rz2+1.3)/2.6,c=amber(p.rn);
+      var al=(0.25+depth*0.75)*(0.6+0.4*Math.sin(tt*p.tws+p.tw));
+      if(p.ring)al=0.5+0.5*Math.sin(tt*2+p.tw);
+      ctx.globalAlpha=Math.max(0,Math.min(1,al));
+      ctx.fillStyle='rgb('+c[0]+','+c[1]+','+c[2]+')';
+      ctx.beginPath();ctx.arc(sx,sy,p.sz*f*(p.ring?1.2:1)*(W/680),0,6.2832);ctx.fill();}
+    ctx.globalAlpha=1;var pulse=1+0.06*Math.sin(tt*2.4),cr=R*0.34*pulse;
+    var g=ctx.createRadialGradient(cx,cy,1,cx,cy,cr);
+    g.addColorStop(0,'rgba(255,253,245,1)');g.addColorStop(0.16,'rgba(255,240,196,0.95)');
+    g.addColorStop(0.4,'rgba(255,210,74,0.85)');g.addColorStop(0.66,'rgba(255,140,40,0.5)');
+    g.addColorStop(0.86,'rgba(210,90,12,0.2)');g.addColorStop(1,'rgba(180,60,8,0)');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,cr,0,6.2832);ctx.fill();
+    ctx.fillStyle='rgba(255,255,250,0.95)';ctx.beginPath();
+    ctx.arc(cx,cy,R*0.03*pulse,0,6.2832);ctx.fill();
+    ctx.globalCompositeOperation='source-over';
+  })();
+})();
+
+/* reveal-on-scroll, same behaviour as the receptionist page */
+(function(){
+  var els=document.querySelectorAll('.reveal');
+  if(!els.length||!window.IntersectionObserver)return;
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{rootMargin:'0px 0px -10% 0px'});
+  els.forEach(function(e){io.observe(e);});
+})();
+</script>
+</body></html>
