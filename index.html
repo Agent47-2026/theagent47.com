@@ -149,16 +149,16 @@ nav .inner{
 :focus-visible{outline:2px solid var(--live);outline-offset:3px}
 
 /* ── hero ── */
-header.hero{padding:132px 0 96px;position:relative;overflow:hidden}
+header.hero{padding:104px 0 76px;position:relative;overflow:hidden}
 
 .hero-grid{display:block;position:relative;z-index:2}
 /* Cap the text itself, not the wrap — otherwise .wrap's auto margins centre
    the whole column and the hero stops aligning with the sections below.
    The copy sits in a single child div, so the cap goes there. */
-.hero-grid > div{max-width:560px}
+.hero-grid > div{max-width:860px}
 @media(max-width:960px){.hero-grid > div{max-width:none}}
 h1{
-  font-size:clamp(34px,5.6vw,64px);line-height:1.08;margin:22px 0 24px;font-weight:900;
+  font-size:clamp(34px,5.6vw,64px);line-height:1.08;margin:10px 0 22px;font-weight:900;
   text-wrap:balance;
 }
 h1 .accent{color:var(--live)}
@@ -407,13 +407,13 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 }
 #orb{
   width:min(560px,86vw); height:min(560px,86vw);
-  margin-left:38%;                 /* pushed right, text sits clear of it */
+  margin-left:52%;                 /* pushed right, text sits clear of it */
   opacity:.98;
 }
 .orbwrap::after{                    /* fade it into the page, no hard edge */
   content:""; position:absolute; inset:0;
   background:
-    linear-gradient(to right,#000 0%,#000 40%,rgba(0,0,0,.72) 54%,rgba(0,0,0,.12) 74%,rgba(0,0,0,0) 100%),
+    linear-gradient(to right,#000 0%,#000 50%,rgba(0,0,0,.78) 62%,rgba(0,0,0,.14) 80%,rgba(0,0,0,0) 100%),
     linear-gradient(to bottom,#000 0%,rgba(0,0,0,0) 16%,rgba(0,0,0,0) 74%,#000 100%);
 }
 
