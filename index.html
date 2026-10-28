@@ -933,17 +933,37 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 </script>
 <script>
 /* ── sending an enquiry ──────────────────────────────────────────────
-   formsubmit.co measured at 84s to first byte, and one request in two
-   came back 522 (Cloudflare: origin never answered). So a single POST
-   is not good enough: this tries three times with backoff, and if all
-   three fail it stops pretending and shows the address to write to,
-   with the person's own text still on screen to copy. An enquiry is
-   never silently dropped.                                            */
+   Was formsubmit.co: 84s to first byte, and one request in two came
+   back 522 - Cloudflare saying the origin never answered. Now
+   Web3Forms, which replies in tens of milliseconds.
+
+   The access key is public by design. It only permits sending mail to
+   the address it was created for; it reads nothing and exposes
+   nothing. The honeypot below is what keeps the spam out.
+
+   The three attempts and the fallback stay regardless of provider: if
+   every attempt fails, the person is given the address to write to and
+   their own words are still on screen.                                */
 window.A47send = function(form, opts){
+  var KEY = '560729d0-533a-444c-a157-93f4a975c9c9';
+  var MAIL = 'admin@exotichutllc.com';
   var m = opts.msg, btn = form.querySelector('button'),
       label = btn.textContent, settled = false, tries = 0;
-  var MAIL = 'admin@exotichutllc.com';
-  var payload = JSON.stringify(Object.fromEntries(new FormData(form)));
+
+  // formsubmit's _-prefixed fields do not exist here; map the two that
+  // matter and drop the rest.
+  var raw = Object.fromEntries(new FormData(form));
+  var data = { access_key: KEY };
+  Object.keys(raw).forEach(function(k){
+    if(k === '_subject')      data.subject  = raw[k];
+    else if(k === '_honey')   data.botcheck = raw[k];
+    else if(k.charAt(0) === '_') return;
+    else                      data[k] = raw[k];
+  });
+  // so a reply goes back to them, whichever field carried the address
+  var addr = (data.email || data.contact || '').trim();
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(addr)) data.replyto = addr;
+  var payload = JSON.stringify(data);
 
   function ok(){
     settled = true;
@@ -960,29 +980,23 @@ window.A47send = function(form, opts){
   }
   function attempt(){
     tries++;
-    return fetch('https://formsubmit.co/ajax/' + MAIL, {
+    return fetch('https://api.web3forms.com/submit', {
       method:'POST', keepalive:true,
       headers:{'Content-Type':'application/json', Accept:'application/json'},
       body: payload
-    }).then(function(r){
-      if(!r.ok) throw new Error('http ' + r.status);
-      return r.json();
-    }).then(function(d){
-      if(!(d.success === true || d.success === 'true')) throw new Error('rejected');
+    }).then(function(r){ return r.json(); }).then(function(d){
+      if(!(d.success === true || d.success === 'true')) throw new Error(d.message || 'rejected');
       if(!settled) ok();
       form.reset();
     }).catch(function(){
       if(tries < 3){ return new Promise(function(res){
-        setTimeout(res, tries * 4000);
+        setTimeout(res, tries * 2000);
       }).then(attempt); }
       giveUp();
     });
   }
 
   btn.disabled = true; btn.textContent = 'Sending...';
-  // Confirm early rather than hold somebody on a request that takes a
-  // minute and a half. If every attempt then fails, the message is
-  // corrected above.
   setTimeout(function(){ if(!settled) ok(); }, 700);
   attempt();
 };
