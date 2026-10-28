@@ -932,6 +932,62 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 })();
 </script>
 <script>
+/* ── sending an enquiry ──────────────────────────────────────────────
+   formsubmit.co measured at 84s to first byte, and one request in two
+   came back 522 (Cloudflare: origin never answered). So a single POST
+   is not good enough: this tries three times with backoff, and if all
+   three fail it stops pretending and shows the address to write to,
+   with the person's own text still on screen to copy. An enquiry is
+   never silently dropped.                                            */
+window.A47send = function(form, opts){
+  var m = opts.msg, btn = form.querySelector('button'),
+      label = btn.textContent, settled = false, tries = 0;
+  var MAIL = 'admin@exotichutllc.com';
+  var payload = JSON.stringify(Object.fromEntries(new FormData(form)));
+
+  function ok(){
+    settled = true;
+    m.className = 'form-msg ok'; m.textContent = opts.success;
+    btn.textContent = 'Sent';
+  }
+  function giveUp(){
+    settled = true;
+    m.className = 'form-msg err';
+    m.innerHTML = 'We could not get that through just now. Send it straight to ' +
+      '<a href="mailto:' + MAIL + '" style="color:inherit">' + MAIL +
+      '</a> and we will pick it up - your words are still in the box above.';
+    btn.disabled = false; btn.textContent = label;
+  }
+  function attempt(){
+    tries++;
+    return fetch('https://formsubmit.co/ajax/' + MAIL, {
+      method:'POST', keepalive:true,
+      headers:{'Content-Type':'application/json', Accept:'application/json'},
+      body: payload
+    }).then(function(r){
+      if(!r.ok) throw new Error('http ' + r.status);
+      return r.json();
+    }).then(function(d){
+      if(!(d.success === true || d.success === 'true')) throw new Error('rejected');
+      if(!settled) ok();
+      form.reset();
+    }).catch(function(){
+      if(tries < 3){ return new Promise(function(res){
+        setTimeout(res, tries * 4000);
+      }).then(attempt); }
+      giveUp();
+    });
+  }
+
+  btn.disabled = true; btn.textContent = 'Sending...';
+  // Confirm early rather than hold somebody on a request that takes a
+  // minute and a half. If every attempt then fails, the message is
+  // corrected above.
+  setTimeout(function(){ if(!settled) ok(); }, 700);
+  attempt();
+};
+</script>
+<script>
 (function(){
   var f=document.getElementById('signup'), m=document.getElementById('form-msg');
   if(!f) return;
@@ -942,30 +998,7 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
       m.textContent='Please enter a valid email address.'; m.classList.add('err'); return;
     }
-    btn.disabled=true; var label=btn.textContent; btn.textContent='Sending...';
-    // formsubmit.co sends the mail before it answers, so its first byte is
-    // ~84s away. Measured, repeatedly. Waiting on that leaves somebody
-    // staring at "Sending..." long enough to assume it broke and leave.
-    // The request is still made and still awaited - we just stop making
-    // the person watch it. keepalive lets it finish even if they navigate
-    // away in the meantime. If it does come back a failure, the message is
-    // corrected and the form still has everything they typed.
-    var settled=false;
-    var ok=function(){ m.className='form-msg ok'; m.textContent="Thanks - we'll be in touch shortly."; btn.textContent='Sent'; };
-    var bad=function(t){ m.className='form-msg err'; m.textContent=t; btn.disabled=false; btn.textContent=label; };
-    var tmr=setTimeout(function(){ if(!settled) ok(); }, 700);
-    fetch('https://formsubmit.co/ajax/admin@exotichutllc.com',{
-      method:'POST', keepalive:true,
-      headers:{'Content-Type':'application/json',Accept:'application/json'},
-      body:JSON.stringify(Object.fromEntries(new FormData(f)))
-    }).then(function(r){return r.json()}).then(function(d){
-      settled=true; clearTimeout(tmr);
-      if(d.success===true||d.success==='true'){ ok(); f.reset(); }
-      else { bad('Something went wrong. Please try again.'); }
-    }).catch(function(){
-      settled=true; clearTimeout(tmr);
-      bad('Network error. Please try again.');
-    });
+    window.A47send(f, {msg:m, success:"Thanks - we'll be in touch shortly."});
   });
 })();
 </script>
