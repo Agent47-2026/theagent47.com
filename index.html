@@ -411,11 +411,13 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 
 .ours .after{margin:20px 0 0;font-size:14px;color:var(--muted);max-width:60ch}
 
-/* ── contact ── */
-.contact{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:30px}
-.contact .mail{font-family:"Space Mono",monospace;font-size:15px;color:var(--ink-2);
-  text-decoration:none;border-bottom:1px solid var(--line-visible);padding-bottom:3px}
-.contact .mail:hover{color:var(--live);border-color:var(--live)}
+/* ── contact ──
+   The shared .signup rules centre the form for the receptionist's centred
+   CTA; this section is left-aligned, so pull it back to the left edge. */
+#contact .signup{justify-content:flex-start}
+#contact .signup-note a{color:inherit;text-decoration:none;
+  border-bottom:1px solid var(--line-visible)}
+#contact .signup-note a:hover{color:var(--live);border-color:var(--live)}
 
 /* ── mobile first: this page is mostly read on a phone, from a QR ──
    The receptionist page was designed desktop-down. A card scan is the
@@ -684,10 +686,18 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
     <p class="lede">That is usually where an agent earns its keep. Tell us what it is —
       if it is not worth building, we will say so.</p>
 
-    <div class="contact">
-      <a class="btn" href="mailto:admin@exotichutllc.com">Email us</a>
-      <a class="mail" href="mailto:admin@exotichutllc.com">admin@exotichutllc.com</a>
-    </div>
+    <form class="signup" id="signup" novalidate>
+      <input type="hidden" name="_subject" value="Agent 47 - new enquiry">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
+      <label for="signup-email" class="hp">Your email address</label>
+      <input id="signup-email" type="email" name="email" placeholder="you@yourbusiness.com" required autocomplete="email">
+      <button class="btn" type="submit">Talk to us</button>
+    </form>
+    <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+    <p class="signup-note">No spam &middot; or email
+      <a href="mailto:admin@exotichutllc.com">admin@exotichutllc.com</a></p>
   </div>
 </section>
 
@@ -793,6 +803,31 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
     es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
   },{rootMargin:'0px 0px -10% 0px'});
   els.forEach(function(e){io.observe(e);});
+})();
+</script>
+<script>
+(function(){
+  var f=document.getElementById('signup'), m=document.getElementById('form-msg');
+  if(!f) return;
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var email=f.email.value.trim(), btn=f.querySelector('button');
+    m.className='form-msg';
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){
+      m.textContent='Please enter a valid email address.'; m.classList.add('err'); return;
+    }
+    btn.disabled=true; var label=btn.textContent; btn.textContent='Sending...';
+    fetch('https://formsubmit.co/ajax/admin@exotichutllc.com',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify(Object.fromEntries(new FormData(f)))
+    }).then(function(r){return r.json()}).then(function(d){
+      if(d.success===true||d.success==='true'){ f.reset(); m.textContent="Thanks - we'll be in touch shortly."; m.classList.add('ok'); }
+      else { m.textContent='Something went wrong. Please try again.'; m.classList.add('err'); }
+    }).catch(function(){
+      m.textContent='Network error. Please try again.'; m.classList.add('err');
+    }).finally(function(){ btn.disabled=false; btn.textContent=label; });
+  });
 })();
 </script>
 </body></html>
