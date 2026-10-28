@@ -479,11 +479,20 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
    so it comes out of the centred grid and sits in the bottom corner,
    bright, below everything that has to be read. */
 @media(max-width:560px){
-  #orb{position:absolute;right:-70px;bottom:-16px;width:280px;height:280px;
-       margin:0;opacity:.95}
+  /* Most visitors arrive on a phone, so this is the main view, not the
+     fallback. In the corner the orb was clipped 70px off the right and
+     16px off the bottom - an arc of something, which reads as broken.
+     Centred above the headline it is fully visible and deliberate, and
+     every word below it sits on clean ground. 104px is what fits on a
+     375px phone with the button and the line under it still above the
+     fold: at 375x667 everything lands by 657px. */
+  header.hero{padding:148px 0 52px}
+  #orb{position:absolute;left:50%;transform:translateX(-50%);
+       top:58px;right:auto;bottom:auto;
+       width:104px;height:104px;margin:0;opacity:1}
   .orbwrap::after{
-    background:linear-gradient(to bottom,#000 0%,rgba(0,0,0,.55) 8%,
-      rgba(0,0,0,.25) 40%,rgba(0,0,0,0) 72%,rgba(0,0,0,.65) 100%);
+    background:linear-gradient(to bottom,rgba(0,0,0,.35) 0%,rgba(0,0,0,0) 14%,
+      rgba(0,0,0,0) 86%,#000 100%);
   }
 }
 @media(max-width:480px){
@@ -547,9 +556,8 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
   <div class="wrap hero-grid">
     <div class="h1wrap">
       <h1>The jobs nobody has time for,<br><span class="accent">done while you sleep.</span></h1>
-      <p class="sub">Clinics, trades, salons, security, retail — every one of them has jobs
-        nobody has time for. We build something that does them: picks up the phone, books the
-        appointment, sends the reminder the day before. You tell us the job in your business,
+      <p class="sub">Clinics, trades, salons, security, retail. Something that picks up the
+        phone, books the appointment, sends the reminder. You tell us the job in your business,
         we build it, and we keep it running.</p>
       <div class="cta-row">
         <a class="btn" href="#contact">Got a problem? We'll Automate it</a>
