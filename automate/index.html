@@ -1,0 +1,759 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Tell us the job in your business that eats time, gets forgotten, or only happens when somebody remembers. We build the thing that does it instead.">
+<meta property="og:title" content="Got a problem? We’ll automate it.">
+<meta property="og:description" content="Describe the job. We build the thing that does it, and we run it.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://theagent47.com/automate/">
+<meta property="og:image" content="https://theagent47.com/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<title>Got a problem? — Agent 47</title>
+<!-- Favicon. Google Search renders the site icon from a PNG of at least 48px
+     (multiples of 48 preferred) and also probes /favicon.ico; browser tabs use
+     16/32; iOS uses apple-touch-icon; the manifest covers Android/PWA. -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="16x16"  href="/icons/favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32"  href="/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48"  href="/icons/icon-48.png">
+<link rel="icon" type="image/png" sizes="96x96"  href="/icons/icon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#5b8cf5">
+<!-- The receptionist page adds .fx here, which parks every section h2 at
+     opacity:0 until a 150-line typewriter script fades it back in. A QR
+     landing page has to paint instantly and must still read correctly if
+     JS never runs, so .fx is deliberately NOT added; the lighter .reveal
+     fade already in this stylesheet does the motion instead. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@400;600;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap">
+
+<style>
+:root{
+  /* Palette lifted from the reference site's own tokens. */
+  --void:#000000;
+  --ground:#000000;
+  --surface:#111111;
+  --surface-2:#1A1A1A;
+  --line:#222222;
+  --line-soft:#1a1a1a;
+  --line-visible:#333333;
+  --ink:#FFFFFF;
+  --ink-2:#E8E8E8;
+  --muted:#999999;
+  --dim:#666666;
+  --live:#E5690F;
+  --live-dim:#7a3708;
+  --accent-subtle:rgba(229,105,15,.15);
+  --success:#4A9E5C;
+  --warm:#5B9BF6;
+  --maxw:1160px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);
+  background-color:var(--ground);
+  background-image:radial-gradient(circle at 8px 7px, rgba(255,255,255,.055) 0 1px, transparent 1.5px);
+  background-size:26px 26px;
+  background-attachment:fixed;
+  font-family:"Space Mono",ui-monospace,monospace;
+  font-size:15px;line-height:1.72;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;position:relative;z-index:2}
+#stage{
+  position:fixed;inset:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;display:block;
+}
+.vignette{
+  position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(ellipse at center, #0000 40%, #000000a6);
+}
+nav,header.hero,section,footer{position:relative;z-index:2}
+
+/* ── shared type ── */
+.mono{font-family:"Space Mono",ui-monospace,monospace}
+.label{
+  font-family:"Space Mono",ui-monospace,monospace;
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-2);font-weight:500;
+}
+.label.dim{color:var(--muted)}
+h1,h2,h3{font-family:Doto,"Space Mono",monospace;font-weight:700;letter-spacing:.02em}
+h2{font-size:clamp(28px,4.1vw,46px);line-height:1.14;margin:0 0 18px;text-wrap:balance}
+h3{font-size:22px;margin:0 0 8px;line-height:1.25}
+p{margin:0 0 18px;color:var(--ink-2);max-width:64ch}
+em{font-style:normal;color:var(--ink)}
+a{color:inherit}
+
+/* ── nav ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  backdrop-filter:blur(8px);background:rgba(0,0,0,.78);
+  border-bottom:1px solid var(--line-soft);
+}
+nav .inner{
+  max-width:var(--maxw);margin:0 auto;padding:15px 28px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.brand{display:flex;align-items:center;gap:11px;font-family:"Space Mono",monospace;
+  font-size:13px;letter-spacing:.2em;font-weight:700;text-decoration:none;color:var(--ink)}
+.brand .mark{width:26px;height:26px;border-radius:7px;flex:none;
+  background:linear-gradient(135deg,#00c8ff,#a855f7);
+  display:grid;place-items:center;padding:4.5px;box-sizing:border-box;
+  box-shadow:0 0 10px rgba(0,200,255,.28);animation:markGlow 3s ease-in-out infinite}
+.brand .mark svg{width:100%;height:100%;color:#fff;filter:drop-shadow(0 0 1.5px rgba(255,255,255,.55))}
+@keyframes markGlow{0%,100%{box-shadow:0 0 10px rgba(0,200,255,.28)}50%{box-shadow:0 0 16px rgba(120,150,255,.45)}}
+@media(prefers-reduced-motion:reduce){.brand .mark{animation:none}}
+@keyframes ping{
+  0%{box-shadow:0 0 0 0 rgba(229,105,15,.55)}
+  70%{box-shadow:0 0 0 9px rgba(229,105,15,0)}
+  100%{box-shadow:0 0 0 0 rgba(229,105,15,0)}
+}
+.navlinks{display:flex;gap:26px;align-items:center}
+.navlinks a{font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s}
+.navlinks a:hover,.navlinks a:focus-visible{color:var(--ink)}
+@media(max-width:800px){.navlinks{display:none}}
+
+.btn{
+  display:inline-block;font-family:"Space Mono",monospace;font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;text-decoration:none;
+  padding:12px 22px;border:1px solid var(--ink-2);color:var(--ink);
+  background:transparent;cursor:pointer;transition:all .22s;border-radius:2px;
+}
+.btn:hover,.btn:focus-visible{background:var(--ink);color:var(--void)}
+.btn.ghost{border-color:var(--line-visible);color:var(--muted)}
+.btn.ghost:hover,.btn.ghost:focus-visible{border-color:var(--ink-2);background:transparent;color:var(--ink)}
+
+  /* -- signup form -- */
+  .signup{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+  .signup input[type=email]{
+    font-family:"Space Mono",monospace;font-size:13px;letter-spacing:.02em;
+    padding:12px 16px;min-width:300px;border-radius:2px;
+    border:1px solid var(--line-visible);background:var(--surface);color:var(--ink);
+    transition:border-color .22s;
+  }
+  .signup input[type=email]::placeholder{color:var(--dim)}
+  .signup input[type=email]:focus{outline:none;border-color:var(--live)}
+  .signup .btn{border-color:var(--live);color:var(--live)}
+  .signup .btn:hover,.signup .btn:focus-visible{background:var(--live);color:var(--void)}
+  .signup-note{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:16px}
+  .form-msg{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.06em;margin-top:18px;min-height:18px}
+  .form-msg.ok{color:var(--success)}
+  .form-msg.err{color:var(--live)}
+  .hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}
+  @media(max-width:560px){.signup input[type=email]{min-width:0;width:100%}.signup .btn{width:100%}}
+:focus-visible{outline:2px solid var(--live);outline-offset:3px}
+
+/* ── hero ── */
+header.hero{padding:104px 0 76px;position:relative;overflow:hidden}
+
+.hero-grid{display:block;position:relative;z-index:2}
+/* Cap the text itself, not the wrap — otherwise .wrap's auto margins centre
+   the whole column and the hero stops aligning with the sections below.
+   The copy sits in a single child div, so the cap goes there. */
+.hero-grid > div{max-width:860px}
+@media(max-width:960px){.hero-grid > div{max-width:none}}
+h1{
+  font-size:clamp(34px,5.6vw,64px);line-height:1.08;margin:10px 0 22px;font-weight:900;
+  text-wrap:balance;
+}
+h1 .accent{color:var(--live)}
+.hl{
+  background:linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 54%,
+    var(--live) 54%,
+    var(--live) 92%,
+    transparent 92%
+  );
+  color:var(--ink);
+  padding:0 .14em;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+}
+.h1wrap{position:relative}
+canvas.blockfx{position:absolute;pointer-events:none;z-index:3}
+/* Headings start hidden ONLY when scripting is on, so the blocks are the
+   first thing you ever see. Without JS the .fx class is never added and
+   every heading renders normally. */
+.fx h1#headline, .fx section h2{opacity:0}
+@media(prefers-reduced-motion:reduce){ .fx h1#headline, .fx section h2{opacity:1} }
+.sub{font-size:16px;color:var(--ink-2);max-width:47ch;margin-bottom:32px}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+/* The page is black with hairline outlines on everything, so a filled
+   shape is the only object on it that is not a stroke. That, plus a slow
+   ring, is what carries the eye here. */
+.cta-row .btn{
+  background:var(--live);border-color:var(--live);color:#120A04;font-weight:700;
+  padding:16px 32px;font-size:13.5px;
+  box-shadow:0 0 0 0 rgba(229,105,15,.55);
+  animation:ctaPulse 1.5s ease-out infinite;
+  transition:background .2s,color .2s,transform .12s}
+.cta-row .btn::after{content:"\2192";font-weight:700;display:inline-block;
+  margin-left:10px;transition:transform .18s}
+.cta-row .btn:hover{background:#FF7A1A;border-color:#FF7A1A;color:#120A04}
+.cta-row .btn:hover::after{transform:translateX(4px)}
+.cta-row .btn:active{transform:translateY(1px)}
+@keyframes ctaPulse{
+  0%{box-shadow:0 0 0 0 rgba(229,105,15,.5), 0 0 22px rgba(229,105,15,.35)}
+  70%{box-shadow:0 0 0 16px rgba(229,105,15,0), 0 0 30px rgba(229,105,15,.45)}
+  100%{box-shadow:0 0 0 0 rgba(229,105,15,0), 0 0 22px rgba(229,105,15,.35)}}
+/* Anyone running "reduce motion" gets the glow without the pulse. */
+@media(prefers-reduced-motion:reduce){
+  .cta-row .btn{animation:none;box-shadow:0 0 24px rgba(229,105,15,.4)}}
+.ctanote{margin-top:13px;font-family:"Space Mono",monospace;font-size:11.5px;
+  letter-spacing:.08em;color:var(--muted)}
+/* One long label instead of two short ones: the old flex row squeezed it
+   to 118px on a phone and broke it over four lines. */
+@media(max-width:560px){
+  .cta-row{display:block}
+  .cta-row .btn{display:block;width:100%;text-align:center;padding:16px 18px}
+}
+
+/* ── hero film ── */
+/* Background, not a card: no frame, anchored to the right edge and scaled
+   past the viewport so the machine reads large. The left is masked to black
+   so the headline always sits on clean ground. */
+.herofilm{
+  /* Full width so there is no visible seam where the film ends; the
+     gradient below does the fading instead of a hard edge. */
+  position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.herofilm video{
+  /* Sized explicitly and anchored right — 30% smaller than the previous
+     cover-fill. The clip is almost entirely black, so its edges blend into
+     the page rather than showing as a hard boundary. */
+  position:absolute;top:50%;left:72%;
+  width:74%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  transition:opacity .25s linear;
+}
+.herofilm::after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(to right, #000 0%, #000 34%, rgba(0,0,0,.78) 46%, rgba(0,0,0,.22) 66%, rgba(0,0,0,0) 100%),
+    linear-gradient(to bottom, #000 0%, rgba(0,0,0,0) 18%, rgba(0,0,0,0) 76%, #000 100%);
+}
+@media(max-width:900px){
+  .herofilm video{
+    inset:0;top:0;left:0;
+    width:100%;height:100%;min-width:0;
+    transform:none;
+    object-fit:contain;
+    object-position:center 30%;
+  }
+  .herofilm::after{
+    background:linear-gradient(to bottom,
+      #000 0%, rgba(0,0,0,.22) 16%, rgba(0,0,0,.5) 46%, rgba(0,0,0,.9) 64%, #000 80%);
+  }
+}
+@media(prefers-reduced-motion:reduce){ .herofilm video{opacity:.9} }
+
+/* ── sections ── */
+section{padding:100px 0;border-top:none;position:relative}
+section::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right, rgba(232,232,232,.18), transparent);
+}
+.eyebrow-row{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.eyebrow-row::after{content:"";height:1px;flex:1;background:var(--line)}
+.lede{font-size:18px;color:var(--ink);max-width:62ch;line-height:1.6}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ── stat strip ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);
+  border:1px solid var(--line-soft);margin-top:44px}
+@media(max-width:760px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--surface);padding:30px 26px}
+.stat .n{font-family:Doto,monospace;font-weight:900;font-size:42px;color:var(--ink);line-height:1}
+.stat .t{font-size:14px;color:var(--muted);margin-top:9px}
+
+/* ── section films ── */
+/* Same treatment as the hero: background, no frame, faded out toward the
+   text so the copy always sits on clean black. */
+.secfilm{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.secfilm video{
+  position:absolute;top:50%;left:70%;
+  width:62%;min-width:520px;
+  transform:translate(-50%,-50%);
+  opacity:0;transition:opacity .5s linear;
+}
+.secfilm::after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(to right, #000 0%, #000 32%, rgba(0,0,0,.72) 48%, rgba(0,0,0,.3) 70%, rgba(0,0,0,.6) 100%),
+    linear-gradient(to bottom, #000 0%, rgba(0,0,0,.1) 18%, rgba(0,0,0,.1) 78%, #000 100%);
+}
+section > .wrap{position:relative;z-index:2}
+@media(max-width:900px){
+  .secfilm video{
+    inset:0;top:0;left:0;
+    width:100%;height:100%;min-width:0;min-height:0;
+    transform:none;
+    object-fit:contain;
+    object-position:center 26%;
+  }
+  /* Stacked layout: fade top and bottom instead of left-to-right, so the
+     copy sits on solid black wherever it lands. */
+  .secfilm::after{
+    background:linear-gradient(to bottom,
+      #000 0%, rgba(0,0,0,.25) 14%, rgba(0,0,0,.45) 44%, rgba(0,0,0,.88) 62%, #000 78%);
+  }
+}
+@media(prefers-reduced-motion:reduce){ .secfilm video{opacity:.9} }
+
+/* ── figures ── */
+/* Diagram plays itself: nodes fade in, connectors draw. Only applied once JS
+   has armed it, so without scripting the figure renders complete. */
+/* Nothing here hides the diagram: the initial hidden state is set by JS, so
+   a page without scripting renders it complete and there is no cascade to
+   fight. Connectors are hidden by dash-offset, nodes by inline opacity. */
+#flowfig .fx-node{transition:opacity .45s ease}
+
+.fig{margin:34px 0 0;padding:0}
+.fig svg{width:100%;max-width:880px;height:auto;display:block;color:var(--ink-2)}
+.fig figcaption{
+  margin-top:16px;font-size:13px;color:var(--muted);max-width:60ch;line-height:1.6;
+}
+/* ── flow ── */
+.flow{display:grid;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);margin-top:40px}
+.step{background:var(--surface);padding:26px 28px;display:grid;grid-template-columns:56px 1fr auto;
+  gap:22px;align-items:start}
+@media(max-width:700px){.step{grid-template-columns:44px 1fr;gap:16px}.step .ms{display:none}}
+.step .k{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);padding-top:4px;letter-spacing:.1em}
+.step h3{font-size:19px;margin-bottom:5px}
+.step p{margin:0;font-size:15px}
+.step .ms{font-family:"Space Mono",monospace;font-size:10.5px;color:var(--muted);
+  white-space:nowrap;padding-top:6px;letter-spacing:.08em}
+
+/* ── capability grid ── */
+.caps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line-soft);
+  border:1px solid var(--line-soft);margin-top:42px}
+@media(max-width:900px){.caps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.caps{grid-template-columns:1fr}}
+.cap{background:var(--surface);padding:28px 26px;transition:background .25s}
+.cap:hover{background:var(--surface-2)}
+.cap .ico{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);
+  letter-spacing:.16em;margin-bottom:14px}
+.cap h3{font-size:18px}
+.cap p{font-size:14.5px;margin:0}
+.cap .capmore{display:block;margin-top:12px;font-family:"Space Mono",monospace;
+  font-size:12px;letter-spacing:.08em;color:var(--muted);text-decoration:none;
+  border-bottom:1px solid var(--line-visible);padding-bottom:2px;width:fit-content}
+.cap .capmore:hover{color:var(--live);border-color:var(--live)}
+
+/* ── split ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start}
+@media(max-width:880px){.split{grid-template-columns:1fr;gap:36px}}
+.card{background:var(--surface-2);border:1px solid var(--line);padding:30px 28px;border-radius:4px}
+.card.hi{border-color:var(--line-visible)}
+.card ul{margin:16px 0 0;padding-left:0;list-style:none}
+.card li{font-size:14.5px;color:var(--ink-2);padding:7px 0 7px 22px;position:relative}
+.card li::before{content:"→";position:absolute;left:0;color:var(--muted);
+  font-family:"Space Mono",monospace;font-size:12px}
+
+/* ── cta ── */
+.cta{text-align:center;padding:110px 0}
+.cta h2{margin-bottom:14px}
+.cta p{margin-left:auto;margin-right:auto}
+footer{border-top:1px solid var(--line-soft);padding:38px 0;
+  font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted);
+  display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;letter-spacing:.08em}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+  /* Decorative films: never show the browser's play button. When autoplay is
+     blocked (iOS Low Power Mode, Android Data Saver) fall back to the poster
+     still image silently, instead of overlaying a manual play control. */
+  video.filmv{pointer-events:none}
+  video.filmv::-webkit-media-controls{display:none!important}
+  video.filmv::-webkit-media-controls-start-playback-button{display:none!important;-webkit-appearance:none}
+  video.filmv::-webkit-media-controls-panel{display:none!important}
+
+/* Skip link: off-screen until keyboard-focused. The receptionist sheet has
+   no .skip rule, so without this it renders as visible body text and shoves
+   the hero down. */
+.skip{position:absolute;left:-9999px;top:0;z-index:100;
+  background:var(--ink);color:var(--void);padding:10px 16px;
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;
+  text-decoration:none;border-radius:2px}
+.skip:focus{left:10px;top:10px}
+
+/* ── Company page additions ────────────────────────────────────────────
+   Everything above this point is the AI Receptionist's own stylesheet,
+   unchanged. These rules add only what that page had no component for:
+   the live orb hero, the product cards, and the mobile-first sizing a
+   QR-code landing needs.
+   ------------------------------------------------------------------ */
+
+/* The hero is a live canvas, not video. 4 KB of JS instead of ~1 MB of
+   mp4 — it renders at the device pixel ratio so it is sharp on any
+   screen, and it paints instantly on a phone on cellular, which is where
+   a business-card QR actually gets scanned. */
+.orbwrap{
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  display:grid; place-items:center; overflow:hidden;
+}
+#orb{
+  width:min(560px,86vw); height:min(560px,86vw);
+  margin-left:52%;                 /* pushed right, text sits clear of it */
+  opacity:.98;
+}
+.orbwrap::after{                    /* fade it into the page, no hard edge */
+  content:""; position:absolute; inset:0;
+  background:
+    linear-gradient(to right,#000 0%,#000 50%,rgba(0,0,0,.78) 62%,rgba(0,0,0,.14) 80%,rgba(0,0,0,0) 100%),
+    linear-gradient(to bottom,#000 0%,rgba(0,0,0,0) 16%,rgba(0,0,0,0) 74%,#000 100%);
+}
+
+/* ── product cards ── */
+.prods{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+  background:var(--line-soft);border:1px solid var(--line-soft);margin-top:36px}
+.prod{background:var(--surface);padding:30px 28px;display:flex;flex-direction:column;
+  transition:background .25s}
+.prod:hover{background:var(--surface-2)}
+.prod .top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.prod .tag{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);border:1px solid var(--line-visible);
+  padding:3px 8px;border-radius:2px}
+.prod .live{color:var(--live);border-color:var(--live-dim)}
+.prod h3{font-size:20px;margin:0 0 8px}
+.prod p{margin:0 0 18px;font-size:15px;flex:1}
+.prod a.more{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;
+  color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-visible);
+  padding-bottom:2px;align-self:flex-start}
+.prod a.more:hover{color:var(--live);border-color:var(--live)}
+
+/* ── "we run on it" ── */
+.ours{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--line-soft);border:1px solid var(--line-soft);margin-top:34px}
+.ours > div{background:var(--surface);padding:22px 20px}
+.ours .n{font-family:Doto,monospace;font-weight:700;font-size:15px;color:var(--ink)}
+.ours .d{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.45}
+.ours .st{display:flex;align-items:center;gap:7px;margin-top:14px;
+  font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--live)}
+.ours .st::before{content:"";width:6px;height:6px;border-radius:50%;
+  background:var(--live);box-shadow:0 0 6px var(--live)}
+
+.ours .after{margin:20px 0 0;font-size:14px;color:var(--muted);max-width:60ch}
+
+
+/* ── the roster of agents ────────────────────────────────────────────
+   Eight cards rather than two products and a list: they are presented
+   as one line-up, each with the job it does. The number is the only
+   ornament - it gives the grid a rhythm and makes the set feel like a
+   roster rather than a pile of features. */
+.agents{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+  background:var(--line-soft);border:1px solid var(--line-soft);margin-top:36px}
+.ag{background:var(--surface);padding:30px 28px;display:flex;flex-direction:column;
+  transition:background .25s}
+.ag:hover{background:var(--surface-2)}
+.ag .num{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;
+  color:var(--muted);margin-bottom:12px}
+.ag h3{font-family:Doto,monospace;font-weight:700;font-size:21px;margin:0 0 10px;
+  color:var(--ink)}
+.ag p{margin:0 0 16px;font-size:14.8px;line-height:1.6;color:var(--ink-2);flex:1}
+.ag a.more{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;
+  color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-visible);
+  padding-bottom:3px;align-self:flex-start}
+.ag a.more:hover{color:var(--live);border-color:var(--live)}
+@media(max-width:860px){
+  .agents{grid-template-columns:1fr}
+  .ag{padding:26px 22px}
+}
+
+/* ── contact ──
+   The shared .signup rules centre the form for the receptionist's centred
+   CTA; this section is left-aligned, so pull it back to the left edge. */
+#contact .signup{justify-content:flex-start}
+#contact .signup-note a{color:inherit;text-decoration:none;
+  border-bottom:1px solid var(--line-visible)}
+#contact .signup-note a:hover{color:var(--live);border-color:var(--live)}
+
+/* ── mobile first: this page is mostly read on a phone, from a QR ──
+   The receptionist page was designed desktop-down. A card scan is the
+   opposite, so these are not an afterthought — they are the main case. */
+@media(max-width:860px){
+  .prods,.caps,.stats{grid-template-columns:1fr}
+  .ours{grid-template-columns:repeat(2,1fr)}
+  section{padding:66px 0}
+  .wrap{padding:0 20px}
+  #orb{margin-left:60%;margin-top:30%;width:min(430px,78vw);height:min(430px,78vw);opacity:.95}
+  .orbwrap::after{
+    background:
+      linear-gradient(to right,#000 0%,rgba(0,0,0,.72) 34%,rgba(0,0,0,.12) 62%,rgba(0,0,0,0) 100%),
+      linear-gradient(to bottom,#000 0%,rgba(0,0,0,.45) 10%,rgba(0,0,0,0) 44%,rgba(0,0,0,0) 76%,#000 97%);
+  }
+  .step{grid-template-columns:40px 1fr}
+  .step .ms{display:none}
+}
+/* On a phone the text runs the full width, so there is no side column to
+   put the orb in. Moving it will not help and dimming it washes it out,
+   so it comes out of the centred grid and sits in the bottom corner,
+   bright, below everything that has to be read. */
+@media(max-width:560px){
+  /* Most visitors arrive on a phone, so this is the main view, not the
+     fallback. In the corner the orb was clipped 70px off the right and
+     16px off the bottom - an arc of something, which reads as broken.
+     Centred above the headline it is fully visible and deliberate, and
+     every word below it sits on clean ground. 104px is what fits on a
+     375px phone with the button and the line under it still above the
+     fold: at 375x667 everything lands by 657px. */
+  /* The orb is sized from the screen's height, not fixed, so it takes
+     whatever room the screen has spare. A 375x667 phone has about ten
+     pixels to give and gets 104px; a 430x932 has plenty and gets 263.
+     The hero is min-height:100svh so section 1 is exactly one screen
+     with nothing of the next section showing under it. svh, not vh, so
+     the mobile browser's address bar does not push the button off. */
+  :root{--orbm:clamp(104px, 60vh - 296px, 300px)}
+  header.hero{min-height:100svh;box-sizing:border-box;
+              padding:calc(var(--orbm) + 44px) 0 52px}
+  #orb{position:absolute;left:50%;transform:translateX(-50%);
+       top:34px;right:auto;bottom:auto;
+       width:var(--orbm);height:var(--orbm);margin:0;opacity:1}
+  .orbwrap::after{
+    background:linear-gradient(to bottom,rgba(0,0,0,.35) 0%,rgba(0,0,0,0) 14%,
+      rgba(0,0,0,0) 86%,#000 100%);
+  }
+}
+@media(max-width:480px){
+  .ours{grid-template-columns:1fr}
+  .cta-row{width:100%}
+  .cta-row .btn{flex:1;text-align:center}
+}
+@media(prefers-reduced-motion:reduce){ #orb{opacity:.6} }
+
+/* ── Friday ─────────────────────────────────────────────────────────────
+   She is the reason the rest of the stack exists, so she gets a block of
+   her own rather than one tile in the roster below. */
+.fridaybox{display:grid;grid-template-columns:1.05fr 1fr;gap:1px;margin-top:36px;
+  background:var(--line-soft);border:1px solid var(--line-soft)}
+.fridaybox .who{background:var(--surface-2);padding:34px 30px}
+.fridaybox .who .nm{font-family:Doto,monospace;font-weight:900;font-size:36px;
+  color:var(--ink);line-height:1;letter-spacing:.02em}
+.fridaybox .who .role{font-family:"Space Mono",monospace;font-size:11px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--live);margin-top:13px}
+.fridaybox .who p{margin:17px 0 0;font-size:15px;color:var(--ink-2);line-height:1.62}
+.fridaybox .who .note{margin-top:21px;padding-top:18px;
+  border-top:1px solid var(--line-visible);font-size:13.5px;color:var(--muted)}
+.fcaps{background:var(--surface);padding:28px;display:flex;flex-direction:column;gap:17px}
+.fcap{display:grid;grid-template-columns:82px 1fr;gap:14px;align-items:baseline}
+.fcap .k{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim)}
+.fcap .v{font-size:14.5px;color:var(--ink-2);line-height:1.52}
+@media(max-width:860px){
+  .fridaybox{grid-template-columns:1fr}
+  .fcap{grid-template-columns:1fr;gap:4px}
+  .fridaybox .who{padding:28px 22px}
+  .fcaps{padding:24px 22px}
+}
+/* ── site nav: every page can reach every other page ── */
+.sitenav{display:flex;flex-wrap:wrap;gap:10px 26px;justify-content:center;align-items:center;
+  padding:28px 20px;border-top:1px solid var(--line);
+  font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.sitenav a{color:var(--muted);text-decoration:none;transition:color .2s}
+.sitenav a:hover,.sitenav a:focus-visible{color:var(--live)}
+.sitenav .here{color:var(--ink)}
+
+/* ── the ask page ────────────────────────────────────────────────────
+   One job: get somebody to describe a problem in their own words.
+   Everything here serves that - the examples exist because nobody can
+   answer "what would you automate?" staring at an empty box, and the
+   three fields exist because every extra field costs a submission. */
+.askhead{padding:130px 0 0}
+.askhead h1{font-size:clamp(32px,5vw,56px);line-height:1.08;margin:14px 0 20px}
+.askhead .sub{max-width:62ch;font-size:17px;line-height:1.62}
+
+.exlabel{margin:44px 0 14px;font-family:"Space Mono",monospace;font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.examples{display:flex;flex-wrap:wrap;gap:10px}
+.ex{font-family:"Space Mono",monospace;font-size:12.5px;line-height:1.3;
+  color:var(--ink-2);background:var(--surface);border:1px solid var(--line-visible);
+  border-radius:2px;padding:11px 14px;cursor:pointer;text-align:left;
+  transition:border-color .18s,color .18s,background .18s}
+.ex:hover,.ex:focus-visible{border-color:var(--live);color:var(--ink);
+  background:var(--surface-2)}
+
+.askform{margin-top:40px;max-width:760px}
+.askform label.fl{display:block;margin:0 0 9px;font-family:"Space Mono",monospace;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.askform textarea,.askform input[type=text],.askform input[type=email]{
+  width:100%;box-sizing:border-box;background:var(--surface);color:var(--ink);
+  border:1px solid var(--line-visible);border-radius:2px;
+  font-family:"Space Mono",monospace;font-size:15px;line-height:1.6;
+  padding:15px 16px;transition:border-color .18s}
+.askform textarea{min-height:190px;resize:vertical}
+.askform textarea:focus,.askform input:focus{outline:none;border-color:var(--live)}
+.askform textarea::placeholder,.askform input::placeholder{color:#6a6a6a}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
+.askform .btn{margin-top:24px;background:var(--live);border-color:var(--live);
+  color:#120A04;font-weight:700;padding:16px 32px;font-size:13.5px}
+.askform .btn:hover{background:#FF7A1A;border-color:#FF7A1A;color:#120A04}
+.askform .btn:disabled{opacity:.55;cursor:default}
+.after{margin-top:18px;font-size:14px;color:var(--muted);max-width:60ch;line-height:1.6}
+.form-msg{margin-top:14px;font-family:"Space Mono",monospace;font-size:13px;min-height:1.2em}
+.form-msg.ok{color:var(--live)}
+.form-msg.err{color:#ff6b6b}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+.proof{margin-top:62px;padding-top:30px;border-top:1px solid var(--line-soft);
+  font-size:15px;color:var(--muted);line-height:1.7;max-width:66ch}
+.proof a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line-visible);
+  padding-bottom:2px}
+.proof a:hover{color:var(--live);border-color:var(--live)}
+
+@media(max-width:700px){
+  .askhead{padding:104px 0 0}
+  .fields{grid-template-columns:1fr}
+  .askform .btn{display:block;width:100%;text-align:center}
+}
+</style>
+<body id="top">
+<a class="skip" href="#main">Skip to content</a>
+<div class="grid-bg" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<nav>
+  <div class="inner">
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><ellipse cx="12" cy="12" rx="10" ry="4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/></svg></span>AGENT 47</a>
+    <div class="navlinks">
+      <a href="/">Home</a>
+      <a href="/#running">Our agents</a>
+      <a href="/aireceptionist/">Receptionist</a>
+      <a href="/welfarecheck/">WelfareCheck</a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+<header class="askhead">
+  <div class="wrap">
+    <p class="label dim mono">Tell us the job</p>
+    <h1>Got a problem?<br><span class="accent">We&rsquo;ll automate it.</span></h1>
+    <p class="sub">Anything in your business that eats time, gets forgotten, or only
+      happens when somebody remembers. Describe it the way you&rsquo;d describe it to a
+      person &mdash; there is no wrong way to write it. Even if you reckon it can&rsquo;t be
+      done, send it anyway.</p>
+
+    <p class="exlabel">Not sure where to start? Tap one</p>
+    <div class="examples">
+      <button type="button" class="ex" data-ex="I miss calls when I'm on a job">I miss calls when I'm on a job</button>
+      <button type="button" class="ex" data-ex="Nobody follows up the quotes">Nobody follows up the quotes</button>
+      <button type="button" class="ex" data-ex="I do the roster on Sunday night">I do the roster on Sunday night</button>
+      <button type="button" class="ex" data-ex="Clients no-show and I find out when they don't turn up">Clients no-show and I find out when they don't turn up</button>
+      <button type="button" class="ex" data-ex="Invoices go out late">Invoices go out late</button>
+      <button type="button" class="ex" data-ex="I type the same order into three places">I type the same order into three places</button>
+      <button type="button" class="ex" data-ex="Nobody checks my night staff got home">Nobody checks my night staff got home</button>
+      <button type="button" class="ex" data-ex="We never ask anyone for a review">We never ask anyone for a review</button>
+    </div>
+
+    <form class="askform" id="ask" novalidate>
+      <input type="hidden" name="_subject" value="Agent 47 - automate this">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
+
+      <label class="fl" for="problem">What should it do?</label>
+      <textarea id="problem" name="problem" required
+        placeholder="Describe it however it comes out. The messier the better &mdash; we would rather read the real thing than a tidy summary."></textarea>
+
+      <div class="fields">
+        <div>
+          <label class="fl" for="name">Your name</label>
+          <input id="name" type="text" name="name" autocomplete="name" placeholder="Name">
+        </div>
+        <div>
+          <label class="fl" for="contact">Email or mobile</label>
+          <input id="contact" type="text" name="contact" required placeholder="How we reach you">
+        </div>
+        <div>
+          <label class="fl" for="business">What the business is</label>
+          <input id="business" type="text" name="business" placeholder="Plumbing, clinic, salon&hellip;">
+        </div>
+      </div>
+
+      <button class="btn" type="submit">Send it</button>
+      <p class="form-msg" id="ask-msg" role="status" aria-live="polite"></p>
+      <p class="after">A person reads every one of these &mdash; not a robot. You&rsquo;ll get an
+        answer on whether it can be built and roughly what it takes. Nobody rings you
+        unless you ask them to.</p>
+    </form>
+
+    <p class="proof">Two of ours are already doing this for other people: the
+      <a href="/aireceptionist/">AI Receptionist</a> answers calls and books jobs,
+      and <a href="/welfarecheck/">WelfareCheck</a> rings a night roster hour by hour
+      to check everyone is safe. Both started as somebody describing a problem.</p>
+  </div>
+</header>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="mono">AGENT 47 &middot; We build it, we run it &middot; theagent47.com</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // Tapping an example seeds the box rather than replacing what is there,
+  // so somebody who has already started typing does not lose it.
+  var box=document.getElementById('problem');
+  document.querySelectorAll('.ex').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t=b.dataset.ex;
+      box.value = box.value.trim() ? box.value.replace(/\s*$/,'') + '\n' + t : t;
+      box.focus();
+      box.setSelectionRange(box.value.length, box.value.length);
+    });
+  });
+})();
+</script>
+<script>
+(function(){
+  var f=document.getElementById('ask'), m=document.getElementById('ask-msg');
+  if(!f) return;
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var problem=f.problem.value.trim(), contact=f.contact.value.trim();
+    var btn=f.querySelector('button');
+    m.className='form-msg';
+    if(problem.length < 10){
+      m.textContent='Tell us a bit more about the job first.'; m.classList.add('err');
+      f.problem.focus(); return;
+    }
+    if(!contact){
+      m.textContent='We need an email or a mobile to come back to you on.';
+      m.classList.add('err'); f.contact.focus(); return;
+    }
+    btn.disabled=true; var label=btn.textContent; btn.textContent='Sending...';
+    fetch('https://formsubmit.co/ajax/admin@exotichutllc.com',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify(Object.fromEntries(new FormData(f)))
+    }).then(function(r){return r.json()}).then(function(d){
+      if(d.success===true||d.success==='true'){
+        f.reset();
+        m.textContent='Got it. A person will read it and come back to you.';
+        m.classList.add('ok');
+      } else {
+        m.textContent='Something went wrong. Please try again.'; m.classList.add('err');
+      }
+    }).catch(function(){
+      m.textContent='Network error. Please try again.'; m.classList.add('err');
+    }).finally(function(){ btn.disabled=false; btn.textContent=label; });
+  });
+})();
+</script>
+</body></html>
