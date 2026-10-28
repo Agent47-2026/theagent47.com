@@ -449,6 +449,31 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 
 .ours .after{margin:20px 0 0;font-size:14px;color:var(--muted);max-width:60ch}
 
+
+/* ── the roster of agents ────────────────────────────────────────────
+   Eight cards rather than two products and a list: they are presented
+   as one line-up, each with the job it does. The number is the only
+   ornament - it gives the grid a rhythm and makes the set feel like a
+   roster rather than a pile of features. */
+.agents{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+  background:var(--line-soft);border:1px solid var(--line-soft);margin-top:36px}
+.ag{background:var(--surface);padding:30px 28px;display:flex;flex-direction:column;
+  transition:background .25s}
+.ag:hover{background:var(--surface-2)}
+.ag .num{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.2em;
+  color:var(--muted);margin-bottom:12px}
+.ag h3{font-family:Doto,monospace;font-weight:700;font-size:21px;margin:0 0 10px;
+  color:var(--ink)}
+.ag p{margin:0 0 16px;font-size:14.8px;line-height:1.6;color:var(--ink-2);flex:1}
+.ag a.more{font-family:"Space Mono",monospace;font-size:12px;letter-spacing:.08em;
+  color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-visible);
+  padding-bottom:3px;align-self:flex-start}
+.ag a.more:hover{color:var(--live);border-color:var(--live)}
+@media(max-width:860px){
+  .agents{grid-template-columns:1fr}
+  .ag{padding:26px 22px}
+}
+
 /* ── contact ──
    The shared .signup rules centre the form for the receptionist's centred
    CTA; this section is left-aligned, so pull it back to the left edge. */
@@ -578,32 +603,59 @@ footer{border-top:1px solid var(--line-soft);padding:38px 0;
 <!-- ── proof first, claims later ───────────────────────────────────── -->
 <section id="running">
   <div class="wrap reveal">
-    <div class="eyebrow-row"><span class="label mono">Running now</span></div>
-    <h2>Two products answering real calls, tonight.</h2>
-    <p class="lede">Not prototypes. Both are live, on real phone numbers, with real
-      customers on the other end.</p>
+    <div class="eyebrow-row"><span class="label mono">Our agents</span></div>
+    <h2>Eight agents. Each one does a job<br>somebody used to do by hand.</h2>
+    <p class="lede">We did not read about these. We built them, and we use them.</p>
 
-    <div class="prods">
-      <div class="prod">
-        <div class="top"><span class="tag live">● Live</span><span class="tag">Voice</span></div>
+    <div class="agents">
+      <div class="ag">
+        <div class="num">01</div>
         <h3>AI Receptionist</h3>
-        <p>Answers every call and text, knows the business, books the job, takes the
-          order, and passes on the ones that need a person. Nothing goes to voicemail.</p>
-        <a class="more" href="/aireceptionist/">See the receptionist →</a>
+        <p>Answers every call and every text, at any hour. Knows the business, books the job, takes the order, and hands over only what genuinely needs you. Nothing goes to voicemail.</p>
+        <a class="more" href="/aireceptionist/">See the receptionist &rarr;</a>
       </div>
-      <div class="prod">
-        <div class="top"><span class="tag live">● Live</span><span class="tag">Voice</span></div>
+      <div class="ag">
+        <div class="num">02</div>
         <h3>WelfareCheck</h3>
-        <p>Rings everyone on a night roster, hour by hour, and asks if they are okay.
-          No answer and it escalates to their supervisor, then reports in the morning.</p>
-        <a class="more" href="/welfarecheck/">See WelfareCheck →</a>
+        <p>Rings every person on a night roster, hour by hour, and asks if they are okay. If someone does not answer it escalates until a human picks up. A full report lands before breakfast.</p>
+        <a class="more" href="/welfarecheck/">See WelfareCheck &rarr;</a>
       </div>
-    </div>
-
-    <div class="stats">
-      <div class="stat"><div class="n">2</div><div class="t">products in production</div></div>
-      <div class="stat"><div class="n">Sept</div><div class="t">live since September 2026</div></div>
-      <div class="stat"><div class="n">7</div><div class="t">days to build the second one</div></div>
+      <div class="ag">
+        <div class="num">03</div>
+        <h3>Friday</h3>
+        <p>A personal assistant you talk to out loud. She books the diary, chases what is owed, writes what needs writing and remembers what you said last week — the job you would otherwise hire a person to do.</p>
+        <a class="more" href="#contact">See Friday &rarr;</a>
+      </div>
+      <div class="ag">
+        <div class="num">04</div>
+        <h3>Watchman</h3>
+        <p>Keeps every other agent honest. Restarts what stopped, retries what failed, resends what never arrived, rolls back a bad change, and rewrites the code when the code is the problem. Nobody gets woken up.</p>
+        <a class="more" href="#contact">See Watchman &rarr;</a>
+      </div>
+      <div class="ag">
+        <div class="num">05</div>
+        <h3>AmazonSellerAI</h3>
+        <p>Built for Amazon sellers. Finds the product, finds the supplier, negotiates the price, gets it listed and runs the ads — the whole run, from first search to first sale.</p>
+        <a class="more" href="#contact">See AmazonSellerAI &rarr;</a>
+      </div>
+      <div class="ag">
+        <div class="num">06</div>
+        <h3>Scribe</h3>
+        <p>Learns a voice and writes in it, so everything that goes out sounds like the person it came from.</p>
+        <a class="more" href="#contact">See Scribe &rarr;</a>
+      </div>
+      <div class="ag">
+        <div class="num">07</div>
+        <h3>MiaLexAI</h3>
+        <p>Reads contracts and tells you what is actually in them, in plain words, before you sign anything.</p>
+        <a class="more" href="#contact">See MiaLexAI &rarr;</a>
+      </div>
+      <div class="ag">
+        <div class="num">08</div>
+        <h3>LocalGuideAI</h3>
+        <p>Runs a marketplace front desk: listings, enquiries, bookings and the follow-ups nobody gets around to.</p>
+        <a class="more" href="#contact">See LocalGuideAI &rarr;</a>
+      </div>
     </div>
   </div>
 </section>
